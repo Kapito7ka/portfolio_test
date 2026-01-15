@@ -1,33 +1,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { db } from '@/services/firebase'
-import { collection, getDocs } from 'firebase/firestore'
-
-const collectionsList = ref([])
-
+import { getCollections } from '@/services/portfolioService'
+const collections = ref([])
 onMounted(async () => {
-  const querySnapshot = await getDocs(collection(db, 'collections'))
-  collectionsList.value = querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }))
+  collections.value = await getCollections()
 })
 </script>
-
 <template>
   <section>
     <h1>Портфоліо</h1>
-    <p>Нижче представлені фотоколекції.</p>
+    <p>Нижче представлені колекції.</p>
 
     <div class="grid">
-      <div
-        class="card"
-        v-for="item in collectionsList"
-        :key="item.id"
-      >
-        <img :src="item.image" :alt="item.name" />
+      <div class="card" v-for="item in collections" :key="item.id">
+        <img :src="item.image" />
         <h3>{{ item.name }}</h3>
-        <p>{{ item.location }}</p>
       </div>
     </div>
   </section>
