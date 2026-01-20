@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate:firestore": "node scripts/migrate-rtdb-to-firestore.mjs"
   },
   "dependencies": {
     "firebase": "^12.7.0",

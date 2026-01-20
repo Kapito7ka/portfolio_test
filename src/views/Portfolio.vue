@@ -2,15 +2,26 @@
 import { ref, onMounted } from 'vue'
 import { db } from '@/firebase'
 import { collection, getDocs } from 'firebase/firestore'
-
 const collectionsList = ref([])
-
 onMounted(async () => {
-  const querySnapshot = await getDocs(collection(db, 'collections'))
-  collectionsList.value = querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }))
+  const categoriesSnapshot = await getDocs(collection(db, 'categories'))
+  const allCollections = []
+  categoriesSnapshot.forEach(catDoc => {
+    const catId = catDoc.id
+    const catData = catDoc.data() || {}
+    const catName = catData.name
+    const collections = catData.collections || {}
+    Object.entries(collections).forEach(([colId, colValue]) => {
+      if (!colValue) return
+      allCollections.push({
+        id: `${catId}_${colId}`,
+        categoryId: catId,
+        categoryName: catName,
+        ...colValue,
+      })
+    })
+  })
+  collectionsList.value = allCollections
 })
 </script>
 
@@ -28,6 +39,7 @@ onMounted(async () => {
         <img :src="item.image" :alt="item.name" />
         <h3>{{ item.name }}</h3>
         <p>{{ item.location }}</p>
+        <p v-if="item.categoryName" class="category-label"> Категорія: {{ item.categoryName }} </p>
       </div>
     </div>
   </section>
