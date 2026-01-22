@@ -2,6 +2,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc } from 'firebase/firestore'
+import BaseImage from '@/components/BaseImage.vue'
+import BaseButton from '@/components/BaseButton.vue'
 const fullName = ref({ ua: '', en: '' })
 const description = ref({ ua: '', en: '' })
 
@@ -30,15 +32,10 @@ const switchLanguage = (lang) => {
   <section>
     <h1>Про нас</h1>
     <div>
-      <button @click="switchLanguage('ua')" :disabled="language==='ua'">UA</button>
-      <button @click="switchLanguage('en')" :disabled="language==='en'">EN</button>
+      <BaseButton label="UA" @click="switchLanguage('ua')"/>
+      <BaseButton label="EN" @click="switchLanguage('en')"/>
     </div>
-    <img
-      v-if="image"
-      :src="image"
-      alt="Фото"
-      style="max-width: 300px; border-radius: 12px; margin: 12px 0;"
-    />
+    <BaseImage v-if="image" :src="image" alt="Фото фотографа"/>
     <h2>{{ name || 'Завантаження...' }}</h2>
     <p>{{ desc }}</p>
   </section>
