@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getContacts } from '@/services/contactsService'
+import ContactList from '@/components/ContactList.vue'
 const contacts = ref(null)
 onMounted(async () => {
   contacts.value = await getContacts()
@@ -10,11 +11,6 @@ onMounted(async () => {
 <template>
   <section>
     <h1>Контакти</h1>
-    <ul v-if="contacts">
-      <li>Телефон: {{ contacts.phone }}</li>
-      <li v-if="contacts.instagram"> Instagram: <a :href="contacts.instagram" target="_blank"> {{ contacts.instagram }} </a></li>
-      <li v-if="contacts.facebook">Facebook:<a :href="contacts.facebook" target="_blank"> {{ contacts.facebook }}</a></li>
-      <li v-if="contacts.tiktok">TikTok:<a :href="contacts.tiktok" target="_blank"> {{ contacts.tiktok }}</a></li>
-    </ul>
+    <ContactList :contacts="contacts" />
   </section>
 </template>
