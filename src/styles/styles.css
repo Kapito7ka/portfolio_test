@@ -33,13 +33,42 @@ p {
   margin-bottom: 20px;
 }
 
+/* Container */
+.container {
+  padding: 20px;
+}
 
+/*.Navigation */
+.nav {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: #f3f3f3;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav a:hover {
+  color: #42b883;
+}
+
+.nav a.router-link-active {
+  color: #42b883;
+}
+
+/* Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
 }
 
+/* Card */
 .card {
   border: 1px solid #e0e0e0;
   padding: 12px;
@@ -55,6 +84,18 @@ p {
   display: block;
 }
 
+/* Base Image */
+.base-image-container {
+  margin: 12px 0;
+}
+
+.base-image {
+  max-width: 300px;
+  border-radius: 12px;
+  display: block;
+}
+
+/* Lists */
 ul {
   list-style: none;
   padding: 0;
@@ -63,4 +104,11 @@ ul {
 li {
   margin-bottom: 8px;
   color: #333;
+}
+
+/* Category Label */
+.category-label {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
 }
