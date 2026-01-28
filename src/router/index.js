@@ -9,7 +9,8 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'Portfolio', component: Portfolio },
     { path: '/about', name: 'About', component: About },
-    { path: '/contacts', name: 'Contacts', component: Contacts }
+    { path: '/contacts', name: 'Contacts', component: Contacts },
+    { path: '/admin/about', name: 'AdminAbout', component: () => import('@/views/AdminAbout.vue')}
   ]
 })
 
