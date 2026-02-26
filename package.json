@@ -13,6 +13,7 @@
     "migrate:firestore": "node scripts/migrate-rtdb-to-firestore.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
     "firebase": "^12.7.0",
     "postgres": "^3.4.8",
     "vue": "^3.5.26",
