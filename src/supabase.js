@@ -11,10 +11,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Клієнт Supabase
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+const generateSafeFileName = (originalName) => {
+  const name = typeof originalName === 'string' ? originalName : 'file'
+  const parts = name.split('.')
+  const rawExt = parts.length > 1 ? parts.pop() : 'jpg'
+  const ext = (rawExt || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).slice(2, 8)
+
+  return `${timestamp}_${random}.${ext}`
+}
+
 // --- Функція завантаження фото ---
 export async function uploadPhoto(file) {
   if (!file) return null
-  const fileName = `${Date.now()}_${file.name}`
+  const fileName = generateSafeFileName(file.name)
 
   // Завантаження файлу
   const { data: uploadData, error: uploadError } = await supabase.storage

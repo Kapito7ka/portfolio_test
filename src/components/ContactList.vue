@@ -5,7 +5,11 @@ import {
   getContacts,
   setContactField,
   normalizeContactEntries,
-  isContactUrl
+  isContactUrl,
+  isValidContactKey,
+  isValidContactValue,
+  normalizeContactKey,
+  normalizeContactValue
 } from '@/services/contactsService'
 
 const props = defineProps({
@@ -33,6 +37,7 @@ const newValue = ref('')
 const isSaving = ref(false)
 const editingKey = ref(null)
 const editingValue = ref('')
+const errorText = ref('')
 
 onMounted(async () => {
   if (!contactsState.value) {
@@ -44,10 +49,26 @@ const entries = computed(() => normalizeContactEntries(contactsState.value))
 
 const isUrl = (v) => isContactUrl(v)
 
+const displayKey = (key) => {
+  const k = normalizeContactKey(key)
+  const lower = k.toLowerCase()
+  if (lower === 'phone' || lower === 'tel' || lower === 'telephone') return 'Телефон'
+  if (lower === 'instagram') return 'Instagram'
+  if (lower === 'facebook') return 'Facebook'
+  if (lower === 'tiktok') return 'TikTok'
+  if (lower === 'threads' || lower === 'treads') return 'Threads'
+  if (!k) return ''
+  return k.charAt(0).toUpperCase() + k.slice(1)
+}
+
 const addField = async () => {
-  const key = newKey.value.trim()
-  const value = newValue.value.trim()
-  if (!key || !value) return
+  errorText.value = ''
+  const key = normalizeContactKey(newKey.value)
+  const value = normalizeContactValue(newValue.value)
+  if (!isValidContactKey(key) || !isValidContactValue(value)) {
+    errorText.value = 'Некоректний контакт: перевір назву та значення (не можна null/None/-1/порожнє).'
+    return
+  }
 
   isSaving.value = true
   const ok = await setContactField(key, value)
@@ -83,8 +104,12 @@ const cancelEdit = () => {
 
 const saveEdit = async () => {
   const key = editingKey.value
-  const value = editingValue.value.trim()
-  if (!key || !value) return
+  errorText.value = ''
+  const value = normalizeContactValue(editingValue.value)
+  if (!isValidContactKey(key) || !isValidContactValue(value)) {
+    errorText.value = 'Некоректне значення контакту (не можна null/None/-1/порожнє).'
+    return
+  }
 
   isSaving.value = true
   const ok = await setContactField(key, value)
@@ -99,24 +124,30 @@ const saveEdit = async () => {
 <template>
   <div>
     <ul v-if="contactsState">
-      <li v-for="item in entries" :key="item.key">
-        <strong>{{ item.key }}:</strong>
+      <li v-for="item in entries" :key="item.key" class="contactRow">
+        <strong class="contactKey">{{ displayKey(item.key) }}:</strong>
         
         <template v-if="editingKey === item.key">
-          <input v-model="editingValue" :disabled="isSaving" style="margin-left: 8px;" />
-          <button type="button" :disabled="isSaving" @click="saveEdit" style="margin-left: 8px;"> Зберегти </button>
-          <button type="button" :disabled="isSaving" @click="cancelEdit" style="margin-left: 8px;"> Скасувати </button>
+          <input v-model="editingValue" :disabled="isSaving" class="contactInput" />
+          <button type="button" :disabled="isSaving" @click="saveEdit">Зберегти</button>
+          <button type="button" :disabled="isSaving" @click="cancelEdit">Скасувати</button>
         </template>
         
         <template v-else>
-          <template v-if="isUrl(item.value)">
-            <a :href="item.value" target="_blank" rel="noopener noreferrer"> {{ item.value }}</a>
+          <template v-if="isUrl(item.value.trim())">
+            <a :href="item.value" target="_blank" rel="noopener noreferrer" class="contactValue">
+              {{ item.value }}
+            </a>
           </template>
-          <template v-else> {{ item.value }} </template>
+          <template v-else>
+            <span class="contactValue">{{ item.value }}</span>
+          </template>
           
           <template v-if="editable">
-            <button type="button" :disabled="isSaving" @click="startEdit(item.key, item.value)" style="margin-left: 10px;"> Редагувати </button>
-            <button type="button" :disabled="isSaving" @click="removeField(item.key)" style="margin-left: 10px;"> Видалити </button>
+            <span class="contactActions">
+              <button type="button" :disabled="isSaving" @click="startEdit(item.key, item.value)">Редагувати</button>
+              <button type="button" :disabled="isSaving" @click="removeField(item.key)">Видалити</button>
+            </span>
           </template>
         </template>
       </li>
@@ -129,6 +160,35 @@ const saveEdit = async () => {
       <input v-model="newKey" placeholder="Ключ (наприклад: instagram)" />
       <input v-model="newValue" placeholder="Значення (посилання або телефон)" />
       <button type="submit" :disabled="isSaving"> Зберегти </button>
+      <p v-if="errorText" class="contactError">{{ errorText }}</p>
     </form>
   </div>
 </template>
+
+<style scoped>
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+.contactKey {
+  min-width: 120px;
+}
+.contactValue {
+  word-break: break-word;
+}
+.contactActions {
+  display: inline-flex;
+  gap: 10px;
+  margin-left: 6px;
+}
+.contactInput {
+  margin-left: 6px;
+}
+.contactError {
+  margin-top: 8px;
+  color: #b42318;
+}
+</style>

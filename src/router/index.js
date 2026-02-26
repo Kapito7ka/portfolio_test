@@ -5,13 +5,16 @@ import About from '../views/About.vue'
 import Contacts from '../views/Contacts.vue'
 import AdminAbout from '../views/admin/AdminAbout.vue'
 import AdminContacts from '../views/admin/AdminContacts.vue'
+import AdminPortfolio from '../views/admin/AdminPortfolio.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'Portfolio', component: Portfolio },
+    { path: '/collections/:categoryId/:collectionId', name: 'Collection', component: () => import('../views/Collection.vue') },
     { path: '/about', name: 'About', component: About },
     { path: '/contacts', name: 'Contacts', component: Contacts },
+    { path: '/admin/portfolio', name: 'AdminPortfolio', component: AdminPortfolio },
     { path: '/admin/about', name: 'AdminAbout', component: () => import('@/views/admin/AdminAbout.vue')},
     { path: '/admin/contacts', name: 'AdminContacts', component: AdminContacts }
   ]

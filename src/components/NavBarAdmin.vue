@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
     <RouterLink to="/">Портфоліо</RouterLink>
     <RouterLink to="/about">Про нас</RouterLink>
     <RouterLink to="/contacts">Контакти</RouterLink>
+    <RouterLink to="/admin/portfolio">Адмін портфоліо</RouterLink>
     <RouterLink to="/admin/about">Адмін про нас</RouterLink>
     <RouterLink to="/admin/contacts">Адмін контакти</RouterLink>
   </nav>

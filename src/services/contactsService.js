@@ -42,11 +42,41 @@ export const deleteContactField = async (key) => {
   }
 }
 
+const GARBAGE_TOKENS = new Set(['null', 'undefined', 'none', 'nan', '-1'])
+
+export const normalizeContactKey = (key) => (key == null ? '' : String(key).trim())
+
+export const normalizeContactValue = (value) => (value == null ? '' : String(value).trim())
+
+export const isValidContactKey = (key) => {
+  const k = normalizeContactKey(key)
+  if (!k) return false
+
+  const lower = k.toLowerCase()
+  if (GARBAGE_TOKENS.has(lower)) return false
+  if (/^-?\d+(\.\d+)?$/.test(k)) return false
+
+  return true
+}
+
+export const isValidContactValue = (value) => {
+  if (value == null) return false
+  if (typeof value === 'object' || typeof value === 'function') return false
+
+  const v = normalizeContactValue(value)
+  if (!v) return false
+
+  const lower = v.toLowerCase()
+  if (GARBAGE_TOKENS.has(lower)) return false
+
+  return true
+}
+
 export const normalizeContactEntries = (contacts) => {
   if (!contacts) return []
   return Object.entries(contacts)
-    .filter(([k, v]) => k && v !== undefined && v !== null && String(v).trim() !== '')
-    .map(([k, v]) => ({ key: k, value: String(v) }))
+    .filter(([k, v]) => isValidContactKey(k) && isValidContactValue(v))
+    .map(([k, v]) => ({ key: String(k), value: normalizeContactValue(v) }))
 }
 
 export const isContactUrl = (v) => /^https?:\/\//i.test(v)
