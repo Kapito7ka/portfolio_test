@@ -8,6 +8,11 @@ import { getCategories, getCollection, setCollectionCoverImage, setCollectionPho
 const isLoading = ref(false)
 const isSaving = ref(false)
 const errorText = ref('')
+const successText = ref('')
+
+// Нові змінні для прогресу
+const uploadProgress = ref(0)
+const uploadStatus = ref('')
 
 const categories = ref([])
 const selectedCategoryId = ref('')
@@ -75,16 +80,30 @@ const handleUpload = async (event) => {
   if (!selectedCategoryId.value || !selectedCollectionId.value) return
 
   errorText.value = ''
+  successText.value = ''
   isSaving.value = true
+  uploadProgress.value = 0 // Скидаємо прогрес
 
   try {
     const current = normalizedPhotos.value.map((p) => ({ url: p.url, fileName: p.fileName }))
     const added = []
+    const total = files.length
 
-    for (const file of files) {
-      const result = await uploadPhoto(file)
-      if (!result) continue
-      added.push({ url: result.publicUrl, fileName: result.fileName, createdAt: Date.now() })
+    for (let i = 0; i < total; i++) {
+      // Оновлюємо статус тексту та відсотки
+      uploadStatus.value = `Завантаження: ${i + 1} з ${total}`
+      
+      const result = await uploadPhoto(files[i])
+      if (result) {
+        added.push({ 
+          url: result.publicUrl, 
+          fileName: result.fileName, 
+          createdAt: Date.now() 
+        })
+      }
+      
+      // Рахуємо прогрес
+      uploadProgress.value = Math.round(((i + 1) / total) * 100)
     }
 
     const next = [...current, ...added]
@@ -94,10 +113,17 @@ const handleUpload = async (event) => {
       await setCollectionCoverImage(selectedCategoryId.value, selectedCollectionId.value, next[0].url)
       selectedCollection.value = { ...(selectedCollection.value || {}), image: next[0].url }
     }
+
+    if (added.length) {
+      successText.value = `Успішно завантажено ${added.length} фото`
+    }
+
   } catch (e) {
     errorText.value = e?.message || 'Помилка завантаження/збереження'
   } finally {
     isSaving.value = false
+    uploadProgress.value = 0 // Приховуємо прогрес-бар після завершення
+    uploadStatus.value = ''
   }
 }
 
@@ -156,10 +182,18 @@ const removePhoto = async (photo) => {
 
         <div class="row">
           <input type="file" multiple :disabled="isSaving" @change="handleUpload" />
-          <BaseButton v-if="isSaving" label="Зберігаю..." />
+          <BaseButton v-if="isSaving" :label="uploadStatus || 'Зберігаю...'" />
+        </div>
+
+        <div v-if="isSaving && uploadProgress > 0" class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
+          </div>
+          <p class="progress-text">{{ uploadProgress }}% готово</p>
         </div>
 
         <p v-if="errorText" class="error">{{ errorText }}</p>
+        <p v-if="successText" class="success">{{ successText }}</p>
 
         <div v-if="normalizedPhotos.length" class="grid">
           <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
@@ -207,5 +241,31 @@ const removePhoto = async (photo) => {
   color: #b42318;
   margin-top: 8px;
 }
-</style>
+.success {
+  color: #067647;
+  margin-top: 8px;
+}
 
+/* Стилі для прогрес-бару */
+.progress-container {
+  margin: 10px 0;
+  max-width: 300px;
+}
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+</style>

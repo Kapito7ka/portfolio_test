@@ -63,9 +63,6 @@ const save = async () => {
     <input placeholder="Імʼя" v-model="form.full_name[activeLang]"/>
     <!-- опис -->
     <textarea placeholder="Опис" v-model="form.description[activeLang]"></textarea>
-    <!-- фото -->
-    <!-- тут я тимчасово закрив для вставки посилання--> 
-    <!-- <input placeholder="Image URL" v-model="form.image"/> -->
     <input type="file" @change="handleUpload" />
     <div v-if="form.image" style="margin-top:10px">
       <img :src="form.image" alt="Фото" style="width:150px" />
