@@ -11,6 +11,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'Portfolio', component: Portfolio },
+    { path: '/portfolio/:categoryId', name: 'CategoryCollections', component: () => import('../views/CategoryCollections.vue') },
     { path: '/collections/:categoryId/:collectionId', name: 'Collection', component: () => import('../views/Collection.vue') },
     { path: '/about', name: 'About', component: About },
     { path: '/contacts', name: 'Contacts', component: Contacts },

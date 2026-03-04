@@ -64,9 +64,8 @@ p {
 /* Grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
-}
 
 /* Card */
 .card {
@@ -111,4 +110,179 @@ li {
   font-size: 14px;
   color: #666;
   font-style: italic;
+}
+
+/* ----- Back link (CategoryCollections, Collection) ----- */
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+.back-link:hover {
+  color: #42b883;
+}
+
+/* ----- Portfolio (головна) ----- */
+.portfolio-welcome {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #333;
+}
+.category-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* ----- CollectionCard ----- */
+.collection-card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #e0e0e0;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+.collection-card:hover {
+  border-color: #000;
+}
+.collection-card__image-wrap {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.collection-card__image,
+.collection-card__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.collection-card__placeholder {
+  background: #eee;
+  min-height: 200px;
+}
+.collection-card__title {
+  margin: 12px 12px 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.collection-card__location {
+  margin: 4px 12px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+.collection-card__arrow {
+  margin: 8px 0 12px;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+/* ----- CategoryCollections ----- */
+.collections-grid {
+  margin-top: 16px;
+}
+
+/* ----- CollectionGallery ----- */
+.collection-gallery .grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 16px;
+}
+
+/* ----- ContactList ----- */
+.contact-list .contactRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+.contact-list .contactKey {
+  min-width: 120px;
+}
+.contact-list .contactValue {
+  word-break: break-word;
+}
+.contact-list .contactActions {
+  display: inline-flex;
+  gap: 10px;
+  margin-left: 6px;
+}
+.contact-list .contactInput {
+  margin-left: 6px;
+}
+.contact-list .contactError {
+  margin-top: 8px;
+  color: #b42318;
+}
+
+/* ----- AdminPortfolio ----- */
+.admin-portfolio .row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 12px 0;
+}
+.admin-portfolio .block {
+  margin-top: 12px;
+}
+.admin-portfolio .block h2 {
+  margin: 0 0 8px;
+}
+.admin-portfolio .block p {
+  margin: 0 0 12px;
+}
+.admin-portfolio .grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 16px;
+}
+.admin-portfolio .photoCard {
+  display: grid;
+  gap: 8px;
+}
+.admin-portfolio .photoActions {
+  display: flex;
+  justify-content: flex-end;
+}
+.admin-portfolio .error {
+  color: #b42318;
+  margin-top: 8px;
+}
+.admin-portfolio .success {
+  color: #067647;
+  margin-top: 8px;
+}
+.admin-portfolio .progress-container {
+  margin: 10px 0;
+  max-width: 300px;
+}
+.admin-portfolio .progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.admin-portfolio .progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+.admin-portfolio .progress-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+.admin-portfolio .admin-portfolio-else {
+  margin-top: 12px;
+}
 }

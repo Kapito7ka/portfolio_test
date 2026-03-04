@@ -41,6 +41,13 @@ watch([categoryId, collectionId], load)
 
 <template>
   <section>
+    <RouterLink
+      :to="{ name: 'CategoryCollections', params: { categoryId } }"
+      class="back-link"
+    >
+      ← Назад до колекцій
+    </RouterLink>
+
     <template v-if="isLoading">
       <p>Завантаження...</p>
     </template>
@@ -59,4 +66,3 @@ watch([categoryId, collectionId], load)
     </template>
   </section>
 </template>
-

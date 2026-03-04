@@ -152,7 +152,7 @@ const removePhoto = async (photo) => {
 </script>
 
 <template>
-  <section>
+  <section class="admin-portfolio">
     <h1>Адмінка · Портфоліо</h1>
 
     <template v-if="isLoading">
@@ -177,8 +177,8 @@ const removePhoto = async (photo) => {
       </div>
 
       <div v-if="selectedCollection" class="block">
-        <h2 style="margin: 0 0 8px;">{{ selectedCollection.name }}</h2>
-        <p v-if="selectedCollection.location" style="margin: 0 0 12px;">{{ selectedCollection.location }}</p>
+        <h2>{{ selectedCollection.name }}</h2>
+        <p v-if="selectedCollection.location">{{ selectedCollection.location }}</p>
 
         <div class="row">
           <input type="file" multiple :disabled="isSaving" @change="handleUpload" />
@@ -204,68 +204,10 @@ const removePhoto = async (photo) => {
           </div>
         </div>
 
-        <p v-else style="margin-top: 12px;">Фото ще не додані.</p>
+        <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
       </div>
 
-      <p v-else style="margin-top: 12px;">Обери колекцію, щоб додати фото.</p>
+      <p v-else class="admin-portfolio-else">Обери колекцію, щоб додати фото.</p>
     </template>
   </section>
 </template>
-
-<style scoped>
-.row {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin: 12px 0;
-}
-.block {
-  margin-top: 12px;
-}
-.grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin-top: 16px;
-}
-.photoCard {
-  display: grid;
-  gap: 8px;
-}
-.photoActions {
-  display: flex;
-  justify-content: flex-end;
-}
-.error {
-  color: #b42318;
-  margin-top: 8px;
-}
-.success {
-  color: #067647;
-  margin-top: 8px;
-}
-
-/* Стилі для прогрес-бару */
-.progress-container {
-  margin: 10px 0;
-  max-width: 300px;
-}
-.progress-bar {
-  width: 100%;
-  height: 10px;
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background-color: #4caf50;
-  transition: width 0.3s ease;
-}
-.progress-text {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-}
-</style>

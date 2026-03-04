@@ -122,7 +122,7 @@ const saveEdit = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="contact-list">
     <ul v-if="contactsState">
       <li v-for="item in entries" :key="item.key" class="contactRow">
         <strong class="contactKey">{{ displayKey(item.key) }}:</strong>
@@ -159,36 +159,9 @@ const saveEdit = async () => {
       <h3>Додати контакт</h3>
       <input v-model="newKey" placeholder="Ключ (наприклад: instagram)" />
       <input v-model="newValue" placeholder="Значення (посилання або телефон)" />
+      <!-- multiple -->
       <button type="submit" :disabled="isSaving"> Зберегти </button>
       <p v-if="errorText" class="contactError">{{ errorText }}</p>
     </form>
   </div>
 </template>
-
-<style scoped>
-.contactRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 6px 0;
-}
-.contactKey {
-  min-width: 120px;
-}
-.contactValue {
-  word-break: break-word;
-}
-.contactActions {
-  display: inline-flex;
-  gap: 10px;
-  margin-left: 6px;
-}
-.contactInput {
-  margin-left: 6px;
-}
-.contactError {
-  margin-top: 8px;
-  color: #b42318;
-}
-</style>

@@ -1,19 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getCollections } from '@/services/portfolioService'
-import CollectionCard from '@/components/CollectionCard.vue'
+import { onMounted, ref } from 'vue'
+import { getCategories } from '@/services/portfolioService'
+import CategoryCard from '@/components/CategoryCard.vue'
 
-const collectionsList = ref([])
+const categories = ref([])
 
 onMounted(async () => {
-  collectionsList.value = await getCollections()
+  categories.value = await getCategories()
 })
 </script>
 
 <template>
-  <section>
-    <h1>Портфоліо</h1>
-    <p>Нижче представлені фотоколекції.</p>
-    <CollectionCard :collectionsList="collectionsList" />
+  <section class="portfolio-section">
+    <p class="portfolio-welcome">
+      Welcome to view warm and sincere photos in my portfolio
+    </p>
+    <div class="grid category-grid">
+      <CategoryCard
+        v-for="cat in categories"
+        :key="cat.id"
+        :category="cat"
+      />
+    </div>
   </section>
 </template>

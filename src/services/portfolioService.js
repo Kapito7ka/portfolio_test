@@ -29,7 +29,13 @@ export const getCollections = async () => {
 export const getCategories = async () => {
   const snapshot = await getDocs(collection(db, 'categories'))
   const out = []
-  snapshot.forEach((d) => out.push({ id: d.id, ...(d.data() || {}) }))
+  snapshot.forEach((d) => {
+    const data = d.data() || {}
+    const collections = data.collections || {}
+    const firstCol = Object.values(collections).find((c) => c && (c.image || (c.photos && c.photos[0])))
+    const image = data.image || (firstCol && (firstCol.image || (firstCol.photos && firstCol.photos[0] && (typeof firstCol.photos[0] === 'string' ? firstCol.photos[0] : firstCol.photos[0]?.url))))
+    out.push({ id: d.id, ...data, image: image || '' })
+  })
   return out
 }
 
