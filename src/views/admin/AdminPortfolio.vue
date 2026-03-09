@@ -18,6 +18,19 @@ const categories = ref([])
 const selectedCategoryId = ref('')
 const selectedCollectionId = ref('')
 const selectedCollection = ref(null)
+const newCollectionName = ref('')
+const newCollectionLocation = ref('')
+const newCollectionId = ref('')
+
+const generateSlug = (text) => {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+}
+watch(newCollectionName, (v) => {
+  newCollectionId.value = generateSlug(v)
+})
 
 const collectionOptions = computed(() => {
   const cat = categories.value.find((c) => c.id === selectedCategoryId.value)
@@ -93,7 +106,7 @@ const handleUpload = async (event) => {
       // Оновлюємо статус тексту та відсотки
       uploadStatus.value = `Завантаження: ${i + 1} з ${total}`
       
-      const result = await uploadPhoto(files[i])
+      const result = await uploadPhoto(files[i], selectedCategoryId.value, selectedCollectionId.value)
       if (result) {
         added.push({ 
           url: result.publicUrl, 
@@ -149,6 +162,59 @@ const removePhoto = async (photo) => {
     isSaving.value = false
   }
 }
+const setCover = async (photo) => {
+  if (!photo?.url) return
+  if (!selectedCategoryId.value || !selectedCollectionId.value) return
+
+  try {
+    await setCollectionCoverImage(
+      selectedCategoryId.value,
+      selectedCollectionId.value,
+      photo.url
+    )
+
+    // оновлюємо локально
+    selectedCollection.value = {
+      ...(selectedCollection.value || {}),
+      image: photo.url
+    }
+
+  } catch (e) {
+    errorText.value = e?.message || 'Не вдалося встановити обкладинку'
+  }
+}
+const createCollection = async () => {
+  if (!selectedCategoryId.value) return
+  if (!newCollectionId.value) return
+
+  const cat = categories.value.find(c => c.id === selectedCategoryId.value)
+  if (!cat) return
+
+  if (!cat.collections) {
+    cat.collections = {}
+  }
+
+  // зберігаємо в Firestore
+  cat.collections[newCollectionId.value] = {
+  name: newCollectionName.value,
+  location: newCollectionLocation.value,
+  photos: [],
+  image: ''
+}
+
+await setCollectionPhotos(
+  selectedCategoryId.value,
+  newCollectionId.value,
+  []
+)
+
+  // очистити форму
+  newCollectionName.value = ''
+  newCollectionLocation.value = ''
+  newCollectionId.value = ''
+
+  await load()
+}
 </script>
 
 <template>
@@ -175,7 +241,16 @@ const removePhoto = async (photo) => {
           </select>
         </label>
       </div>
-
+      <div class="block">
+      <h2>Створити нову колекцію</h2>
+        <div class="row">
+          <input v-model="newCollectionName" placeholder="Назва колекції"/>
+          <input v-model="newCollectionLocation" placeholder="Локація"/>
+          <input v-model="newCollectionId" placeholder="ID (slug)"/>
+          <BaseButton label="Створити" :disabled="isSaving" @click="createCollection"/>
+        </div>
+      </div>
+      
       <div v-if="selectedCollection" class="block">
         <h2>{{ selectedCollection.name }}</h2>
         <p v-if="selectedCollection.location">{{ selectedCollection.location }}</p>
@@ -199,7 +274,8 @@ const removePhoto = async (photo) => {
           <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
-              <button type="button" :disabled="isSaving" @click="removePhoto(p)">Видалити</button>
+              <button type="button" :disabled="isSaving" @click="setCover(p)">Зробити обкладинкою</button>
+              <button type="button" :disabled="isSaving" @click="removePhoto(p)"> Видалити</button>
             </div>
           </div>
         </div>

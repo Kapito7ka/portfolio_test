@@ -30,7 +30,7 @@ const handleUpload = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
-  // 🔥 Якщо є старе фото — видаляємо
+  //  Якщо є старе фото — видаляємо
   if (currentFileName.value) {
     await deletePhoto(currentFileName.value)
   }

@@ -24,9 +24,16 @@ const generateSafeFileName = (originalName) => {
 }
 
 // --- Функція завантаження фото ---
-export async function uploadPhoto(file) {
+export async function uploadPhoto(file, categoryId, collectionId) {
   if (!file) return null
-  const fileName = generateSafeFileName(file.name)
+
+  const safeCategory = categoryId.replace(/[^a-z0-9-_]/gi, '')
+  const safeCollection = collectionId.replace(/[^a-z0-9-_]/gi, '')
+
+  const safeName = generateSafeFileName(file.name)
+
+  const fileName =
+    `${safeCategory}/${safeCollection}/${safeName}`
 
   // Завантаження файлу
   const { data: uploadData, error: uploadError } = await supabase.storage
