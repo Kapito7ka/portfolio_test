@@ -4,6 +4,8 @@ import BaseButton from '@/components/BaseButton.vue'
 import BaseImage from '@/components/BaseImage.vue'
 import { uploadPhoto, deletePhoto } from '@/supabase'
 import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos } from '@/services/portfolioService'
+import { logout } from '@/supabase'
+import { useRouter } from 'vue-router'
 
 const isLoading = ref(false)
 const isSaving = ref(false)
@@ -214,6 +216,12 @@ await setCollectionPhotos(
   newCollectionId.value = ''
 
   await load()
+}
+//login
+const router = useRouter()
+const handleLogout = async () => {
+  await logout()
+  router.push('/login')
 }
 </script>
 

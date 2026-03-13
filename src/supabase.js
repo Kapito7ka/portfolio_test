@@ -34,7 +34,12 @@ export async function uploadPhoto(file, categoryId, collectionId) {
 
   const fileName =
     `${safeCategory}/${safeCollection}/${safeName}`
-
+  const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName)
+  
+  return { 
+    publicUrl: urlData.publicUrl, // Повертаємо чисте посилання
+    fileName: fileName 
+  }
   // Завантаження файлу
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from('photos')
@@ -71,4 +76,28 @@ export async function deletePhoto(fileName) {
 export function getPhotoUrl(fileName) {
   const { publicUrl } = supabase.storage.from('photos').getPublicUrl(fileName)
   return publicUrl
+}
+// LOGIN
+export async function login(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
+
+// LOGOUT
+export async function logout() {
+  await supabase.auth.signOut()
+}
+
+// GET USER
+export async function getUser() {
+  const { data } = await supabase.auth.getUser()
+  return data.user
 }
