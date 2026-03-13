@@ -3,9 +3,9 @@ import { computed, onMounted, ref, watch } from 'vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseImage from '@/components/BaseImage.vue'
 import { uploadPhoto, deletePhoto } from '@/supabase'
-import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos } from '@/services/portfolioService'
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
+import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos, createCategory } from '@/services/portfolioService'
 
 const isLoading = ref(false)
 const isSaving = ref(false)
@@ -23,6 +23,9 @@ const selectedCollection = ref(null)
 const newCollectionName = ref('')
 const newCollectionLocation = ref('')
 const newCollectionId = ref('')
+const newCategoryName = ref('')
+const newCategoryId = ref('')
+const newCategoryDescription = ref('')
 
 const generateSlug = (text) => {
   return text
@@ -32,6 +35,12 @@ const generateSlug = (text) => {
 }
 watch(newCollectionName, (v) => {
   newCollectionId.value = generateSlug(v)
+})
+
+watch(newCategoryName, (v) => {
+  if (!newCategoryId.value) {
+    newCategoryId.value = generateSlug(v)
+  }
 })
 
 const collectionOptions = computed(() => {
@@ -223,6 +232,41 @@ const handleLogout = async () => {
   await logout()
   router.push('/login')
 }
+
+const createCategoryHandler = async () => {
+  errorText.value = ''
+  successText.value = ''
+  const id = newCategoryId.value.trim() || generateSlug(newCategoryName.value)
+  if (!id) {
+    errorText.value = 'Вкажи ID категорії (латиницею) або назву.'
+    return
+  }
+
+  isSaving.value = true
+  const result = await createCategory({
+    id,
+    name: newCategoryName.value.trim(),
+    description: newCategoryDescription.value.trim()
+  })
+  isSaving.value = false
+
+  if (!result.ok) {
+    if (result.reason === 'exists') {
+      errorText.value = 'Категорія з таким ID вже існує.'
+    } else {
+      errorText.value = 'Не вдалося створити категорію.'
+    }
+    return
+  }
+
+  newCategoryName.value = ''
+  newCategoryId.value = ''
+  newCategoryDescription.value = ''
+
+  await load()
+  selectedCategoryId.value = id
+  successText.value = 'Категорію створено.'
+}
 </script>
 
 <template>
@@ -234,6 +278,16 @@ const handleLogout = async () => {
     </template>
 
     <template v-else>
+      <div class="block">
+        <h2>Нова категорія</h2>
+        <div class="row">
+          <input v-model="newCategoryName" placeholder="Назва категорії" />
+          <input v-model="newCategoryId" placeholder="ID (наприклад: wedding)" />
+          <input v-model="newCategoryDescription" placeholder="Опис (необовʼязково)" />
+          <BaseButton label="Створити категорію" :disabled="isSaving" @click="createCategoryHandler" />
+        </div>
+      </div>
+
       <div class="row">
         <label>
           Категорія:

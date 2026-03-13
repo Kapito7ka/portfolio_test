@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import { collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore'
 
 export const getCollections = async () => {
   const categoriesSnapshot = await getDocs(collection(db, 'categories'))
@@ -44,6 +44,29 @@ export const getCategory = async (categoryId) => {
   const snap = await getDoc(doc(db, 'categories', categoryId))
   if (!snap.exists()) return null
   return { id: snap.id, ...(snap.data() || {}) }
+}
+
+export const createCategory = async ({ id, name, description }) => {
+  const trimmedId = (id || '').trim()
+  if (!trimmedId) return { ok: false, reason: 'empty_id' }
+  try {
+    const ref = doc(db, 'categories', trimmedId)
+    const snap = await getDoc(ref)
+    if (snap.exists()) {
+      return { ok: false, reason: 'exists' }
+    }
+
+    await setDoc(ref, {
+      name: name || trimmedId,
+      description: description || '',
+      collections: {}
+    })
+
+    return { ok: true }
+  } catch (error) {
+    console.error('Firestore error (createCategory):', error)
+    return { ok: false, reason: 'error' }
+  }
 }
 
 export const getCollection = async (categoryId, collectionId) => {
