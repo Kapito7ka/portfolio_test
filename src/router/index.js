@@ -25,14 +25,25 @@ const router = createRouter({
     { path: '/admin', component: AdminPortfolio, meta: { requiresAuth: true }}
   ]
 })
-router.beforeEach(async (to) => {
-  // Якщо шлях починається на /admin — перевіряємо авторизацію
-  if (to.path.startsWith('/admin')) {
-    const { data } = await supabase.auth.getUser()
+router.beforeEach(async (to, from, next) => {
+  // 1. Отримуємо юзера один раз
+  const { data } = await supabase.auth.getUser()
+  const user = data.user
+  
+  // 2. Твій "Білий список" (впиши сюди свій Gmail!)
+  const allowedEmails = ['my.post@gmail.com']
 
-    if (!data.user) {
-      return '/login' // Якщо юзера немає — на вихід до сторінки логіна
+  // 3. Перевірка: якщо йдемо в адмінку
+  if (to.path.startsWith('/admin')) {
+    // Якщо юзера немає АБО його імейл не в списку
+    if (!user || !allowedEmails.includes(user.email)) {
+      if (user) await supabase.auth.signOut() // Вилоговуємо чужака
+      next('/login')
+    } else {
+      next() // Все ок, пускаємо
     }
+  } else {
+    next() // Звичайні сторінки доступні всім
   }
 })
 export default router
