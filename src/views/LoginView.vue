@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { login } from '@/supabase'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase' // Імпортуємо налаштування Supabase
+import { supabase } from '@/supabase' 
 
 const loginWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({

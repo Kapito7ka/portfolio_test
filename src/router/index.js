@@ -26,18 +26,12 @@ const router = createRouter({
   ]
 })
 router.beforeEach(async (to, from, next) => {
-  // 1. Отримуємо юзера один раз
   const { data } = await supabase.auth.getUser()
   const user = data.user
-  
-  // 2. Твій "Білий список" (впиши сюди свій Gmail!)
   const allowedEmails = ['my.post@gmail.com']
-
-  // 3. Перевірка: якщо йдемо в адмінку
   if (to.path.startsWith('/admin')) {
-    // Якщо юзера немає АБО його імейл не в списку
     if (!user || !allowedEmails.includes(user.email)) {
-      if (user) await supabase.auth.signOut() // Вилоговуємо чужака
+      if (user) await supabase.auth.signOut() 
       next('/login')
     } else {
       next() // Все ок, пускаємо
