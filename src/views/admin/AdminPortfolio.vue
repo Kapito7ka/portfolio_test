@@ -8,8 +8,8 @@ import slugify from 'slug'
 import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto } from '@/supabase'
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
-import { getCategories, getCollection, setCollectionCoverImage, setCategoryCoverImage, setCollectionPhotos, setCollectionData, createCategory, updateCollection, deleteCategory, deleteCollection as deleteCollectionService } from '@/services/portfolioService'
-import { usePagination } from '@/composables/usePagination'
+import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos, createCategory } from '@/services/portfolioService'
+
 const isLoading = ref(false)
 const isSaving = ref(false)
 const errorText = ref('')
@@ -371,7 +371,7 @@ const removePhoto = async (photo) => {
 }
 
 const setCover = async (photo) => {
-  if (!photo?.url) return
+  if (!photo?.url || !photo?.fileName) return
   if (!selectedCategoryId.value || !selectedCollectionId.value) return
 
   errorText.value = ''
@@ -380,26 +380,18 @@ const setCover = async (photo) => {
   uploadingCollectionId.value = selectedCollectionId.value
 
   try {
-    const oldCoverFileName = currentCategory.value?.collections?.[selectedCollectionId.value]?.coverFileName || ''
-    const coverFileName = photo.fileName || ''
-
     await setCollectionCoverImage(
       selectedCategoryId.value,
       selectedCollectionId.value,
-      photo.url,
-      coverFileName
+      photo.url
     )
 
-    if (oldCoverFileName && coverFileName && oldCoverFileName !== coverFileName) {
-      try {
-        await deletePhoto(oldCoverFileName)
-      } catch (err) {
-        console.warn('Не вдалося видалити попередню обкладинку колекції:', err)
-      }
+    // оновлюємо локально
+    selectedCollection.value = {
+      ...(selectedCollection.value || {}),
+      image: photo.url
     }
 
-    successText.value = 'Обкладинку колекції оновлено.'
-    await load()
   } catch (e) {
     errorText.value = e?.message || 'Не вдалося встановити обкладинку'
   } finally {
@@ -476,143 +468,6 @@ const createCategoryHandler = async () => {
   selectedCategoryId.value = id
   successText.value = 'Категорію створено.'
 }
-
-const deleteCurrentCategory = async (categoryId = selectedCategoryId.value) => {
-  if (!categoryId) return
-  if (!confirm('Видалити цю категорію?')) return
-
-  errorText.value = ''
-  isSaving.value = true
-  try {
-    const ok = await deleteCategory(categoryId)
-    if (!ok) {
-      throw new Error('Не вдалося видалити категорію з бази')
-    }
-    categories.value = categories.value.filter(c => c.id !== categoryId)
-    if (selectedCategoryId.value === categoryId) {
-      selectedCategoryId.value = categories.value[0]?.id || ''
-    }
-
-    await load()
-    successText.value = 'Категорію видалено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка видалення категорії'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const editCurrentCategory = async () => {
-  if (!selectedCategoryId.value || !currentCategory.value) return
-  const newName = prompt('Нова назва категорії:', currentCategory.value.name)
-  if (!newName) return
-
-  errorText.value = ''
-  isSaving.value = true
-  try {
-    const cat = categories.value.find(c => c.id === selectedCategoryId.value)
-    if (cat) {
-      cat.name = newName.trim()
-      categories.value = [...categories.value]
-    }
-    successText.value = 'Категорію оновлено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка оновлення категорії'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const deleteCollection = async (collectionId) => {
-  if (!selectedCategoryId.value) return
-  if (!confirm('Видалити цю колекцію разом з фото?')) return
-
-  errorText.value = ''
-  isSaving.value = true
-  try {
-    const collection = await getCollection(selectedCategoryId.value, collectionId)
-    const photos = Array.isArray(collection?.photos) ? collection.photos : []
-    for (const photo of photos) {
-      const fileName = typeof photo === 'object' ? photo.fileName : null
-      if (fileName) {
-        try {
-          await deletePhoto(fileName)
-        } catch (e) {
-          console.error('Помилка видалення файлу:', e)
-        }
-      }
-    }
-
-    const ok = await deleteCollectionService(selectedCategoryId.value, collectionId)
-    if (!ok) {
-      throw new Error('Не вдалося видалити колекцію з бази')
-    }
-
-    await load()
-    successText.value = 'Колекцію видалено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка видалення колекції'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const editCollection = async (collectionId) => {
-  const collection = collectionOptions.value.find(c => c.id === collectionId)
-  if (!collection) return
-
-  const newName = prompt('Нова назва колекції:', collection.name)
-  if (!newName) return
-
-  errorText.value = ''
-  isSaving.value = true
-  try {
-    const cat = categories.value.find(c => c.id === selectedCategoryId.value)
-    if (cat?.collections?.[collectionId]) {
-      cat.collections[collectionId].name = newName.trim()
-      await updateCollection(selectedCategoryId.value, collectionId, { name: newName.trim() })
-    }
-    await load()
-    successText.value = 'Колекцію оновлено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка оновлення колекції'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const deleteAllPhotosInCollection = async (collectionId) => {
-  if (!selectedCategoryId.value) return
-  if (!confirm('Видалити всі фото з цієї колекції?')) return
-
-  errorText.value = ''
-  isSaving.value = true
-  try {
-    const collection = await getCollection(selectedCategoryId.value, collectionId)
-    const photos = Array.isArray(collection?.photos) ? collection.photos : []
-    
-    // Видаляємо файли
-    for (const photo of photos) {
-      const fileName = typeof photo === 'object' ? photo.fileName : null
-      if (fileName) {
-        try {
-          await deletePhoto(fileName)
-        } catch (e) {
-          console.error('Помилка видалення файлу:', e)
-        }
-      }
-    }
-    
-    // Очищуємо масив фото
-    await setCollectionPhotos(selectedCategoryId.value, collectionId, [])
-    await load()
-    successText.value = 'Всі фото видалено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка видалення фото'
-  } finally {
-    isSaving.value = false
-  }
-}
 </script>
 
 <template>
@@ -624,7 +479,7 @@ const deleteAllPhotosInCollection = async (collectionId) => {
     </template>
 
     <template v-else>
-      <div class="collections-header">
+      <div class="block">
         <h2>Нова категорія</h2>
         <NavButton label="+" variant="add" @click="showNewCategoryForm = !showNewCategoryForm" />
       </div>
@@ -637,57 +492,28 @@ const deleteAllPhotosInCollection = async (collectionId) => {
         </div>
       </div>
 
-      <AdminCategoryList
-        :categories="categories"
-        :selectedCategoryId="selectedCategoryId"
-        :isSaving="isSaving"
-        :uploadingCategoryId="uploadingCategoryId"
-        @select="selectCategory"
-        @delete="deleteCurrentCategory"
-        @edit="(id) => { selectedCategoryId = id; editCurrentCategory() }"
-        @setCover="setCategoryCover"
-      />
+      <div class="row">
+        <label>
+          Категорія:
+          <select v-model="selectedCategoryId" :disabled="isSaving">
+            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name || c.id }}</option>
+          </select>
+        </label>
 
-      <input
-        ref="categoryFileInput"
-        type="file"
-        accept="image/*"
-        :disabled="isSaving"
-        @change="handleCategoryCoverUpload"
-        style="display: none"
-      />
-      <input
-        ref="collectionCoverFileInput"
-        type="file"
-        accept="image/*"
-        :disabled="isSaving"
-        @change="handleCollectionCoverUpload"
-        style="display: none"
-      />
-
-      <AdminCollectionList
-        :collections="collectionOptions"
-        :selectedCollectionId="selectedCollectionId"
-        :isSaving="isSaving"
-        :uploadingCollectionId="uploadingCollectionId"
-        @select="selectCollection"
-        @delete="deleteCollection"
-        @edit="editCollection"
-        @addPhotos="openFileDialogForCollection"
-        @setCollectionCover="setCollectionCover"
-        @toggleNew="showNewCollectionForm = !showNewCollectionForm"
-      />
-
-      <!-- Нова колекція (акордеон) -->
-      <div class="accordion" v-if="showNewCollectionForm">
-        <div class="accordion-content">
-          <div class="form-row">
-            <input v-model="newCollectionName" placeholder="Назва колекції"/>
-            <input v-model="newCollectionLocation" placeholder="Локація"/>
-            <input v-model="newCollectionId" placeholder="ID (slug)"/>
-            <NavButton label="Створити" variant="add" :disabled="isSaving" @click="createCollection"/>
-            <NavButton label="Скасувати" variant="delete" @click="showNewCollectionForm = false"/>
-          </div>
+        <label>
+          Колекція:
+          <select v-model="selectedCollectionId" :disabled="isSaving || !collectionOptions.length">
+            <option v-for="c in collectionOptions" :key="c.id" :value="c.id">{{ c.name }}</option>
+          </select>
+        </label>
+      </div>
+      <div class="block">
+      <h2>Створити нову колекцію</h2>
+        <div class="row">
+          <input v-model="newCollectionName" placeholder="Назва колекції"/>
+          <input v-model="newCollectionLocation" placeholder="Локація"/>
+          <input v-model="newCollectionId" placeholder="ID (slug)"/>
+          <BaseButton label="Створити" :disabled="isSaving" @click="createCollection"/>
         </div>
       </div>
 
@@ -702,54 +528,17 @@ const deleteAllPhotosInCollection = async (collectionId) => {
       <p v-if="errorText" class="error">{{ errorText }}</p>
       <p v-if="successText" class="success">{{ successText }}</p>
 
-      <!-- Вибрана колекція для перегляду фото -->
-      <div v-if="selectedCollection" class="block admin-form">
-        <h2>Фото колекції: {{ selectedCollection.name }}</h2>
-        
-        <div class="form-row">
-          <NavButton label="Додати фото" variant="add" :disabled="isSaving" @click="collectionFileInput?.click()" />
-          <input
-            ref="collectionFileInput"
-            type="file"
-            multiple
-            :disabled="isSaving"
-            @change="(e) => handleUpload(e, selectedCollectionId, selectedCategoryId)"
-            style="display: none"
-          />
-          <BaseButton v-if="isSaving" :label="uploadStatus || 'Зберігаю...'" />
-        </div>
-
-        <div class="grid">
-          <div v-for="p in paginatedPhotos" :key="p.fileName || p.url" class="photoCard">
+        <div v-if="normalizedPhotos.length" class="grid">
+          <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
-              <NavButton
-                v-if="!isCoverPhoto(p)"
-                label="Обкладинка"
-                variant="edit"
-                :disabled="isSaving"
-                @click="setCover(p)"
-              />
-              <NavButton label="Видалити" variant="delete" :disabled="isSaving" @click="removePhoto(p)" />
+              <button type="button" :disabled="isSaving" @click="setCover(p)">Зробити обкладинкою</button>
+              <button type="button" :disabled="isSaving" @click="removePhoto(p)"> Видалити</button>
             </div>
           </div>
         </div>
-        <div v-if="totalPages > 1" class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1">←</button>
 
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            :class="{ active: page === currentPage }"
-            @click="goToPage(page)"
-          >
-            {{ page }}
-          </button>
-
-          <button @click="nextPage" :disabled="currentPage === totalPages">→</button>
-        </div>
-        <p>Всього фото: {{ normalizedPhotos.length }}</p>
-        <p>Сторінка {{ currentPage }} з {{ totalPages }}</p>
+        <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
       </div>
     </template>
   </section>

@@ -1,5 +1,6 @@
 import { db } from '@/firebase'
 import { collection, deleteField, deleteDoc, doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore'
+import { collection, deleteField, deleteDoc, doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore'
 
 export const getCollections = async () => {
   const categoriesSnapshot = await getDocs(collection(db, 'categories'))
@@ -113,11 +114,32 @@ export const setCollectionData = async (categoryId, collectionId, data) => {
 }
 
 export const setCollectionCoverImage = async (categoryId, collectionId, imageUrl, coverFileName) => {
+export const setCollectionData = async (categoryId, collectionId, data) => {
+  if (!categoryId || !collectionId || !data) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    await updateDoc(ref, {
+      [`collections.${collectionId}`]: data
+    })
+    return true
+  } catch (error) {
+    console.error('Firestore error (setCollectionData):', error)
+    return false
+  }
+}
+
+export const setCollectionCoverImage = async (categoryId, collectionId, imageUrl, coverFileName) => {
   if (!categoryId || !collectionId) return false
   try {
     const ref = doc(db, 'categories', categoryId)
     const data = {
+    const data = {
       [`collections.${collectionId}.image`]: imageUrl || ''
+    }
+    if (typeof coverFileName !== 'undefined') {
+      data[`collections.${collectionId}.coverFileName`] = coverFileName || ''
+    }
+    await updateDoc(ref, data)
     }
     if (typeof coverFileName !== 'undefined') {
       data[`collections.${collectionId}.coverFileName`] = coverFileName || ''
