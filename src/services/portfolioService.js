@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import { collection, doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore'
+import { collection, deleteField, deleteDoc, doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore'
 
 export const getCollections = async () => {
   const categoriesSnapshot = await getDocs(collection(db, 'categories'))
@@ -98,16 +98,94 @@ export const setCollectionPhotos = async (categoryId, collectionId, photos) => {
   }
 }
 
-export const setCollectionCoverImage = async (categoryId, collectionId, imageUrl) => {
+export const setCollectionData = async (categoryId, collectionId, data) => {
+  if (!categoryId || !collectionId || !data) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    await updateDoc(ref, {
+      [`collections.${collectionId}`]: data
+    })
+    return true
+  } catch (error) {
+    console.error('Firestore error (setCollectionData):', error)
+    return false
+  }
+}
+
+export const setCollectionCoverImage = async (categoryId, collectionId, imageUrl, coverFileName) => {
+  if (!categoryId || !collectionId) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    const data = {
+      [`collections.${collectionId}.image`]: imageUrl || ''
+    }
+    if (typeof coverFileName !== 'undefined') {
+      data[`collections.${collectionId}.coverFileName`] = coverFileName || ''
+    }
+    await updateDoc(ref, data)
+    return true
+  } catch (error) {
+    console.error('Firestore error (setCollectionCoverImage):', error)
+    return false
+  }
+}
+
+export const setCategoryCoverImage = async (categoryId, imageUrl, coverFileName) => {
+  if (!categoryId) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    const data = {
+      image: imageUrl || ''
+    }
+    if (typeof coverFileName !== 'undefined') {
+      data.coverFileName = coverFileName || ''
+    }
+    await updateDoc(ref, data)
+    return true
+  } catch (error) {
+    console.error('Firestore error (setCategoryCoverImage):', error)
+    return false
+  }
+}
+
+export const updateCollection = async (categoryId, collectionId, updates) => {
+  if (!categoryId || !collectionId || !updates) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    const updateObj = {}
+    Object.keys(updates).forEach(key => {
+      updateObj[`collections.${collectionId}.${key}`] = updates[key]
+    })
+    await updateDoc(ref, updateObj)
+    return true
+  } catch (error) {
+    console.error('Firestore error (updateCollection):', error)
+    return false
+  }
+}
+
+export const deleteCategory = async (categoryId) => {
+  if (!categoryId) return false
+  try {
+    const ref = doc(db, 'categories', categoryId)
+    await deleteDoc(ref)
+    return true
+  } catch (error) {
+    console.error('Firestore error (deleteCategory):', error)
+    return false
+  }
+}
+
+export const deleteCollection = async (categoryId, collectionId) => {
   if (!categoryId || !collectionId) return false
   try {
     const ref = doc(db, 'categories', categoryId)
     await updateDoc(ref, {
-      [`collections.${collectionId}.image`]: imageUrl || ''
+      [`collections.${collectionId}`]: deleteField()
     })
     return true
   } catch (error) {
-    console.error('Firestore error (setCollectionCoverImage):', error)
+    console.error('Firestore error (deleteCollection):', error)
     return false
   }
 }

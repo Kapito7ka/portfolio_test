@@ -28,7 +28,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const { data } = await supabase.auth.getUser()
   const user = data.user
-  const allowedEmails = ['my.post@gmail.com']
+  const allowedEmails = ['my.post@gmail.com', 'pani.x.slava@gmail.com'] // Список дозволених email для доступу до адмінки
   if (to.path.startsWith('/admin')) {
     if (!user || !allowedEmails.includes(user.email)) {
       if (user) await supabase.auth.signOut() 

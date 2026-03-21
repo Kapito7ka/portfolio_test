@@ -1,20 +1,32 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import BaseButton from '@/components/BaseButton.vue'
+import NavButton from '@/components/NavButton.vue'
 import BaseImage from '@/components/BaseImage.vue'
-import { uploadPhoto, deletePhoto } from '@/supabase'
+import AdminCategoryList from '@/components/AdminCategoryList.vue'
+import AdminCollectionList from '@/components/AdminCollectionList.vue'
+import slugify from 'slug'
+import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto } from '@/supabase'
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
-import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos, createCategory } from '@/services/portfolioService'
+import { getCategories, getCollection, setCollectionCoverImage, setCategoryCoverImage, setCollectionPhotos, setCollectionData, createCategory, updateCollection, deleteCategory, deleteCollection as deleteCollectionService } from '@/services/portfolioService'
 
 const isLoading = ref(false)
 const isSaving = ref(false)
 const errorText = ref('')
 const successText = ref('')
 
-// Нові змінні для прогресу
 const uploadProgress = ref(0)
 const uploadStatus = ref('')
+
+const showNewCategoryForm = ref(false)
+const showNewCollectionForm = ref(false)
+const uploadingCollectionId = ref(null)
+const uploadTargetCollectionId = ref('')
+const collectionFileInput = ref(null)
+const collectionCoverFileInput = ref(null)
+const uploadingCategoryId = ref(null)
+const uploadTargetCategoryId = ref('')
+const categoryFileInput = ref(null)
 
 const categories = ref([])
 const selectedCategoryId = ref('')
@@ -28,11 +40,19 @@ const newCategoryId = ref('')
 const newCategoryDescription = ref('')
 
 const generateSlug = (text) => {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
+  const value = typeof text === 'string' ? text.trim() : ''
+  if (!value) return ''
+  const locale = (typeof navigator !== 'undefined' && navigator.language)
+    ? navigator.language.split('-')[0]
+    : 'uk'
+
+  return slugify(value, {
+    lower: true,
+    locale,
+    remove: /[*+~.()"!:@\[\]\/\\]/g
+  })
 }
+
 watch(newCollectionName, (v) => {
   newCollectionId.value = generateSlug(v)
 })
@@ -43,12 +63,16 @@ watch(newCategoryName, (v) => {
   }
 })
 
+const currentCategory = computed(() => {
+  return categories.value.find((c) => c.id === selectedCategoryId.value)
+})
+
 const collectionOptions = computed(() => {
-  const cat = categories.value.find((c) => c.id === selectedCategoryId.value)
+  const cat = currentCategory.value
   const collections = cat?.collections || {}
   return Object.entries(collections)
     .filter(([, v]) => !!v)
-    .map(([id, v]) => ({ id, name: v.name || id }))
+    .map(([id, v]) => ({ id, name: v.name || id, location: v.location || '' }))
     .sort((a, b) => a.name.localeCompare(b.name, 'uk'))
 })
 
@@ -91,33 +115,170 @@ watch(selectedCategoryId, () => {
   selectedCollectionId.value = first
 })
 
-const persistPhotos = async (nextPhotos) => {
-  const ok = await setCollectionPhotos(selectedCategoryId.value, selectedCollectionId.value, nextPhotos)
-  if (!ok) throw new Error('Не вдалося зберегти фото в Firestore')
-  selectedCollection.value = { ...(selectedCollection.value || {}), photos: nextPhotos }
+const selectCategory = (catId) => {
+  if (!catId) return
+  selectedCategoryId.value = catId
+
+  const cat = categories.value.find((c) => c.id === catId)
+  const first = Object.keys(cat?.collections || {})[0] || ''
+  selectedCollectionId.value = first
+  loadSelectedCollection()
 }
 
-const handleUpload = async (event) => {
-  const files = Array.from(event.target.files || [])
+const selectCollection = (collectionId) => {
+  if (!collectionId) return
+  selectedCollectionId.value = collectionId
+  loadSelectedCollection()
+}
+
+const openFileDialogForCollection = (collectionId) => {
+  uploadTargetCollectionId.value = collectionId
+  if (collectionFileInput.value) {
+    collectionFileInput.value.click()
+  }
+}
+
+const openFileDialogForCategory = (categoryId) => {
+  uploadTargetCategoryId.value = categoryId
+  if (categoryFileInput.value) {
+    categoryFileInput.value.click()
+  }
+}
+
+const setCategoryCover = (categoryId) => {
+  openFileDialogForCategory(categoryId)
+}
+
+const setCollectionCover = (collectionId) => {
+  uploadTargetCollectionId.value = collectionId
+  if (collectionCoverFileInput.value) {
+    collectionCoverFileInput.value.click()
+  }
+}
+
+const handleCategoryCoverUpload = async (event) => {
+  const file = event.target.files?.[0]
   event.target.value = ''
-  if (!files.length) return
-  if (!selectedCategoryId.value || !selectedCollectionId.value) return
+  const categoryId = uploadTargetCategoryId.value || selectedCategoryId.value
+  uploadTargetCategoryId.value = ''
+
+  if (!file || !categoryId) return
 
   errorText.value = ''
   successText.value = ''
   isSaving.value = true
-  uploadProgress.value = 0 // Скидаємо прогрес
+  uploadingCategoryId.value = categoryId
 
   try {
-    const current = normalizedPhotos.value.map((p) => ({ url: p.url, fileName: p.fileName }))
+    const existingCategory = categories.value.find((c) => c.id === categoryId)
+    const oldCoverFileName = existingCategory?.coverFileName || ''
+
+    const result = await uploadCategoryCover(file, categoryId)
+    if (!result?.publicUrl) {
+      throw new Error('Не вдалося завантажити обкладинку категорії')
+    }
+
+    const ok = await setCategoryCoverImage(categoryId, result.publicUrl, result.fileName)
+    if (!ok) {
+      throw new Error('Не вдалося зберегти обкладинку категорії')
+    }
+
+    if (oldCoverFileName && oldCoverFileName !== result.fileName) {
+      try {
+        await deletePhoto(oldCoverFileName)
+      } catch (err) {
+        console.warn('Не вдалося видалити попередню обкладинку категорії:', err)
+      }
+    }
+
+    successText.value = 'Обкладинку категорії оновлено.'
+    await load()
+  } catch (e) {
+    errorText.value = e?.message || 'Не вдалося оновити обкладинку категорії'
+  } finally {
+    isSaving.value = false
+    uploadingCategoryId.value = null
+  }
+}
+
+const handleCollectionCoverUpload = async (event) => {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+  const categoryId = selectedCategoryId.value
+  const collectionId = uploadTargetCollectionId.value || selectedCollectionId.value
+  uploadTargetCollectionId.value = ''
+
+  if (!file || !categoryId || !collectionId) return
+
+  errorText.value = ''
+  successText.value = ''
+  isSaving.value = true
+  uploadingCollectionId.value = collectionId
+
+  try {
+    const existingCollection = currentCategory.value?.collections?.[collectionId]
+    const oldCoverFileName = existingCollection?.coverFileName || ''
+
+    const result = await uploadCollectionCover(file, categoryId, collectionId)
+    if (!result?.publicUrl) {
+      throw new Error('Не вдалося завантажити обкладинку колекції')
+    }
+
+    const ok = await setCollectionCoverImage(categoryId, collectionId, result.publicUrl, result.fileName)
+    if (!ok) {
+      throw new Error('Не вдалося зберегти обкладинку колекції')
+    }
+
+    if (oldCoverFileName && oldCoverFileName !== result.fileName) {
+      try {
+        await deletePhoto(oldCoverFileName)
+      } catch (err) {
+        console.warn('Не вдалося видалити попередню обкладинку колекції:', err)
+      }
+    }
+
+    successText.value = 'Обкладинку колекції оновлено.'
+    await load()
+  } catch (e) {
+    errorText.value = e?.message || 'Не вдалося оновити обкладинку колекції'
+  } finally {
+    isSaving.value = false
+    uploadingCollectionId.value = null
+  }
+}
+
+const persistPhotos = async (categoryId, collectionId, nextPhotos) => {
+  const ok = await setCollectionPhotos(categoryId, collectionId, nextPhotos)
+  if (!ok) throw new Error('Не вдалося зберегти фото в Firestore')
+}
+
+const handleUpload = async (event, collectionId = uploadTargetCollectionId.value, categoryId = selectedCategoryId.value) => {
+  const files = Array.from(event.target.files || [])
+  event.target.value = ''
+  uploadTargetCollectionId.value = ''
+  if (!files.length) return
+
+  errorText.value = ''
+  successText.value = ''
+  isSaving.value = true
+  uploadProgress.value = 0
+  uploadingCollectionId.value = collectionId
+
+  try {
+    const collection = await getCollection(categoryId, collectionId)
+    const current = (Array.isArray(collection?.photos) ? collection.photos : []).map((p) => {
+      if (typeof p === 'string') return { url: p, fileName: null }
+      if (p && typeof p === 'object') return { url: p.url || p.publicUrl || p.src || '', fileName: p.fileName || null }
+      return { url: '', fileName: null }
+    }).filter((p) => p.url && String(p.url).trim() !== '')
+
     const added = []
     const total = files.length
 
     for (let i = 0; i < total; i++) {
-      // Оновлюємо статус тексту та відсотки
       uploadStatus.value = `Завантаження: ${i + 1} з ${total}`
       
-      const result = await uploadPhoto(files[i], selectedCategoryId.value, selectedCollectionId.value)
+      const result = await uploadPhoto(files[i], categoryId, collectionId)
       if (result) {
         added.push({ 
           url: result.publicUrl, 
@@ -126,28 +287,29 @@ const handleUpload = async (event) => {
         })
       }
       
-      // Рахуємо прогрес
       uploadProgress.value = Math.round(((i + 1) / total) * 100)
     }
 
     const next = [...current, ...added]
-    await persistPhotos(next)
+    await persistPhotos(categoryId, collectionId, next)
 
-    if (!selectedCollection.value?.image && next[0]?.url) {
-      await setCollectionCoverImage(selectedCategoryId.value, selectedCollectionId.value, next[0].url)
-      selectedCollection.value = { ...(selectedCollection.value || {}), image: next[0].url }
+    if (!collection?.image && next[0]?.url) {
+      await setCollectionCoverImage(categoryId, collectionId, next[0].url, next[0].fileName || '')
     }
 
     if (added.length) {
       successText.value = `Успішно завантажено ${added.length} фото`
     }
 
+    await load()
+
   } catch (e) {
     errorText.value = e?.message || 'Помилка завантаження/збереження'
   } finally {
     isSaving.value = false
-    uploadProgress.value = 0 // Приховуємо прогрес-бар після завершення
+    uploadProgress.value = 0
     uploadStatus.value = ''
+    uploadingCollectionId.value = null
   }
 }
 
@@ -162,71 +324,84 @@ const removePhoto = async (photo) => {
       .filter((p) => p.url !== photo.url)
       .map((p) => ({ url: p.url, fileName: p.fileName }))
 
-    await persistPhotos(next)
+    await persistPhotos(selectedCategoryId.value, selectedCollectionId.value, next)
 
     if (photo.fileName) {
       await deletePhoto(photo.fileName)
     }
+
+    await load()
   } catch (e) {
     errorText.value = e?.message || 'Помилка видалення'
   } finally {
     isSaving.value = false
   }
 }
+
 const setCover = async (photo) => {
-  if (!photo?.url) return
+  if (!photo?.url || !photo?.fileName) return
   if (!selectedCategoryId.value || !selectedCollectionId.value) return
 
+  errorText.value = ''
+  successText.value = ''
+  isSaving.value = true
+  uploadingCollectionId.value = selectedCollectionId.value
+
   try {
+    const oldCoverFileName = currentCategory.value?.collections?.[selectedCollectionId.value]?.coverFileName || ''
+
     await setCollectionCoverImage(
       selectedCategoryId.value,
       selectedCollectionId.value,
-      photo.url
+      photo.url,
+      photo.fileName
     )
 
-    // оновлюємо локально
-    selectedCollection.value = {
-      ...(selectedCollection.value || {}),
-      image: photo.url
+    if (oldCoverFileName && oldCoverFileName !== photo.fileName) {
+      try {
+        await deletePhoto(oldCoverFileName)
+      } catch (err) {
+        console.warn('Не вдалося видалити попередню обкладинку колекції:', err)
+      }
     }
 
+    successText.value = 'Обкладинку колекції оновлено.'
+    await load()
   } catch (e) {
     errorText.value = e?.message || 'Не вдалося встановити обкладинку'
+  } finally {
+    isSaving.value = false
+    uploadingCollectionId.value = null
   }
 }
+
 const createCollection = async () => {
   if (!selectedCategoryId.value) return
   if (!newCollectionId.value) return
 
-  const cat = categories.value.find(c => c.id === selectedCategoryId.value)
-  if (!cat) return
-
-  if (!cat.collections) {
-    cat.collections = {}
+  const collectionId = newCollectionId.value
+  const payload = {
+    name: newCollectionName.value,
+    location: newCollectionLocation.value,
+    photos: [],
+    image: ''
   }
 
-  // зберігаємо в Firestore
-  cat.collections[newCollectionId.value] = {
-  name: newCollectionName.value,
-  location: newCollectionLocation.value,
-  photos: [],
-  image: ''
-}
+  const ok = await setCollectionData(selectedCategoryId.value, collectionId, payload)
+  if (!ok) {
+    errorText.value = 'Не вдалося створити колекцію.'
+    return
+  }
 
-await setCollectionPhotos(
-  selectedCategoryId.value,
-  newCollectionId.value,
-  []
-)
-
-  // очистити форму
   newCollectionName.value = ''
   newCollectionLocation.value = ''
   newCollectionId.value = ''
+  showNewCollectionForm.value = false
 
   await load()
+  selectedCollectionId.value = collectionId
 }
-//login
+
 const router = useRouter()
 const handleLogout = async () => {
   await logout()
@@ -262,10 +437,155 @@ const createCategoryHandler = async () => {
   newCategoryName.value = ''
   newCategoryId.value = ''
   newCategoryDescription.value = ''
+  showNewCategoryForm.value = false
 
   await load()
   selectedCategoryId.value = id
   successText.value = 'Категорію створено.'
+}
+
+const deleteCurrentCategory = async (categoryId = selectedCategoryId.value) => {
+  if (!categoryId) return
+  if (!confirm('Видалити цю категорію?')) return
+
+  errorText.value = ''
+  isSaving.value = true
+  try {
+    // Видаляємо категорію з Firestore
+    const ok = await deleteCategory(categoryId)
+    if (!ok) {
+      throw new Error('Не вдалося видалити категорію з бази')
+    }
+
+    // Оновлюємо локальний стан
+    categories.value = categories.value.filter(c => c.id !== categoryId)
+    if (selectedCategoryId.value === categoryId) {
+      selectedCategoryId.value = categories.value[0]?.id || ''
+    }
+
+    await load()
+    successText.value = 'Категорію видалено.'
+  } catch (e) {
+    errorText.value = e?.message || 'Помилка видалення категорії'
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const editCurrentCategory = async () => {
+  if (!selectedCategoryId.value || !currentCategory.value) return
+  const newName = prompt('Нова назва категорії:', currentCategory.value.name)
+  if (!newName) return
+
+  errorText.value = ''
+  isSaving.value = true
+  try {
+    const cat = categories.value.find(c => c.id === selectedCategoryId.value)
+    if (cat) {
+      cat.name = newName.trim()
+      // Оновлюємо локально
+      categories.value = [...categories.value]
+    }
+    successText.value = 'Категорію оновлено.'
+  } catch (e) {
+    errorText.value = e?.message || 'Помилка оновлення категорії'
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const deleteCollection = async (collectionId) => {
+  if (!selectedCategoryId.value) return
+  if (!confirm('Видалити цю колекцію разом з фото?')) return
+
+  errorText.value = ''
+  isSaving.value = true
+  try {
+    // Видаляємо всі файли з storage
+    const collection = await getCollection(selectedCategoryId.value, collectionId)
+    const photos = Array.isArray(collection?.photos) ? collection.photos : []
+    for (const photo of photos) {
+      const fileName = typeof photo === 'object' ? photo.fileName : null
+      if (fileName) {
+        try {
+          await deletePhoto(fileName)
+        } catch (e) {
+          console.error('Помилка видалення файлу:', e)
+        }
+      }
+    }
+
+    // Видаляємо колекцію з Firestore
+    const ok = await deleteCollectionService(selectedCategoryId.value, collectionId)
+    if (!ok) {
+      throw new Error('Не вдалося видалити колекцію з бази')
+    }
+
+    await load()
+    successText.value = 'Колекцію видалено.'
+  } catch (e) {
+    errorText.value = e?.message || 'Помилка видалення колекції'
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const editCollection = async (collectionId) => {
+  const collection = collectionOptions.value.find(c => c.id === collectionId)
+  if (!collection) return
+
+  const newName = prompt('Нова назва колекції:', collection.name)
+  if (!newName) return
+
+  errorText.value = ''
+  isSaving.value = true
+  try {
+    const cat = categories.value.find(c => c.id === selectedCategoryId.value)
+    if (cat?.collections?.[collectionId]) {
+      cat.collections[collectionId].name = newName.trim()
+      // Оновлюємо назву в Firestore
+      await updateCollection(selectedCategoryId.value, collectionId, { name: newName.trim() })
+    }
+    await load()
+    successText.value = 'Колекцію оновлено.'
+  } catch (e) {
+    errorText.value = e?.message || 'Помилка оновлення колекції'
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const deleteAllPhotosInCollection = async (collectionId) => {
+  if (!selectedCategoryId.value) return
+  if (!confirm('Видалити всі фото з цієї колекції?')) return
+
+  errorText.value = ''
+  isSaving.value = true
+  try {
+    const collection = await getCollection(selectedCategoryId.value, collectionId)
+    const photos = Array.isArray(collection?.photos) ? collection.photos : []
+    
+    // Видаляємо файли
+    for (const photo of photos) {
+      const fileName = typeof photo === 'object' ? photo.fileName : null
+      if (fileName) {
+        try {
+          await deletePhoto(fileName)
+        } catch (e) {
+          console.error('Помилка видалення файлу:', e)
+        }
+      }
+    }
+    
+    // Очищуємо масив фото
+    await setCollectionPhotos(selectedCategoryId.value, collectionId, [])
+    await load()
+    successText.value = 'Всі фото видалено.'
+  } catch (e) {
+    errorText.value = e?.message || 'Помилка видалення фото'
+  } finally {
+    isSaving.value = false
+  }
 }
 </script>
 
@@ -278,74 +598,113 @@ const createCategoryHandler = async () => {
     </template>
 
     <template v-else>
-      <div class="block">
+      <!-- Нова категорія -->
+      <div class="collections-header">
         <h2>Нова категорія</h2>
-        <div class="row">
+        <NavButton label="+" variant="add" @click="showNewCategoryForm = !showNewCategoryForm" />
+      </div>
+      <div v-if="showNewCategoryForm" class="accordion-content">
+        <div class="form-row">
           <input v-model="newCategoryName" placeholder="Назва категорії" />
           <input v-model="newCategoryId" placeholder="ID (наприклад: wedding)" />
           <input v-model="newCategoryDescription" placeholder="Опис (необовʼязково)" />
-          <BaseButton label="Створити категорію" :disabled="isSaving" @click="createCategoryHandler" />
+          <NavButton label="Створити категорію" variant="add" :disabled="isSaving" @click="createCategoryHandler" />
         </div>
       </div>
 
-      <div class="row">
-        <label>
-          Категорія:
-          <select v-model="selectedCategoryId" :disabled="isSaving">
-            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name || c.id }}</option>
-          </select>
-        </label>
+      <!-- БЛОК 1: Категорії (як колекції) -->
+      <AdminCategoryList
+        :categories="categories"
+        :selectedCategoryId="selectedCategoryId"
+        :isSaving="isSaving"
+        :uploadingCategoryId="uploadingCategoryId"
+        @select="selectCategory"
+        @delete="deleteCurrentCategory"
+        @edit="(id) => { selectedCategoryId = id; editCurrentCategory() }"
+        @setCover="setCategoryCover"
+      />
 
-        <label>
-          Колекція:
-          <select v-model="selectedCollectionId" :disabled="isSaving || !collectionOptions.length">
-            <option v-for="c in collectionOptions" :key="c.id" :value="c.id">{{ c.name }}</option>
-          </select>
-        </label>
-      </div>
-      <div class="block">
-      <h2>Створити нову колекцію</h2>
-        <div class="row">
-          <input v-model="newCollectionName" placeholder="Назва колекції"/>
-          <input v-model="newCollectionLocation" placeholder="Локація"/>
-          <input v-model="newCollectionId" placeholder="ID (slug)"/>
-          <BaseButton label="Створити" :disabled="isSaving" @click="createCollection"/>
+      <input
+        ref="categoryFileInput"
+        type="file"
+        accept="image/*"
+        :disabled="isSaving"
+        @change="handleCategoryCoverUpload"
+        style="display: none"
+      />
+      <input
+        ref="collectionCoverFileInput"
+        type="file"
+        accept="image/*"
+        :disabled="isSaving"
+        @change="handleCollectionCoverUpload"
+        style="display: none"
+      />
+
+      <AdminCollectionList
+        :collections="collectionOptions"
+        :selectedCollectionId="selectedCollectionId"
+        :isSaving="isSaving"
+        :uploadingCollectionId="uploadingCollectionId"
+        @select="selectCollection"
+        @delete="deleteCollection"
+        @edit="editCollection"
+        @addPhotos="openFileDialogForCollection"
+        @setCollectionCover="setCollectionCover"
+        @toggleNew="showNewCollectionForm = !showNewCollectionForm"
+      />
+
+      <!-- Нова колекція (акордеон) -->
+      <div class="accordion" v-if="showNewCollectionForm">
+        <div class="accordion-content">
+          <div class="form-row">
+            <input v-model="newCollectionName" placeholder="Назва колекції"/>
+            <input v-model="newCollectionLocation" placeholder="Локація"/>
+            <input v-model="newCollectionId" placeholder="ID (slug)"/>
+            <NavButton label="Створити" variant="add" :disabled="isSaving" @click="createCollection"/>
+            <NavButton label="Скасувати" variant="delete" @click="showNewCollectionForm = false"/>
+          </div>
         </div>
       </div>
-      
-      <div v-if="selectedCollection" class="block">
-        <h2>{{ selectedCollection.name }}</h2>
-        <p v-if="selectedCollection.location">{{ selectedCollection.location }}</p>
 
-        <div class="row">
-          <input type="file" multiple :disabled="isSaving" @change="handleUpload" />
+      <!-- Прогрес завантаження -->
+      <div v-if="isSaving && uploadProgress > 0" class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
+        </div>
+        <p class="progress-text">{{ uploadProgress }}% готово</p>
+      </div>
+
+      <p v-if="errorText" class="error">{{ errorText }}</p>
+      <p v-if="successText" class="success">{{ successText }}</p>
+
+      <!-- Вибрана колекція для перегляду фото -->
+      <div v-if="selectedCollection" class="block admin-form">
+        <h2>Фото колекції: {{ selectedCollection.name }}</h2>
+        
+        <div class="form-row">
+          <NavButton label="Додати фото" variant="add" :disabled="isSaving" @click="collectionFileInput?.click()" />
+          <input
+            ref="collectionFileInput"
+            type="file"
+            multiple
+            :disabled="isSaving"
+            @change="(e) => handleUpload(e, selectedCollectionId, selectedCategoryId)"
+            style="display: none"
+          />
           <BaseButton v-if="isSaving" :label="uploadStatus || 'Зберігаю...'" />
         </div>
 
-        <div v-if="isSaving && uploadProgress > 0" class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
-          </div>
-          <p class="progress-text">{{ uploadProgress }}% готово</p>
-        </div>
-
-        <p v-if="errorText" class="error">{{ errorText }}</p>
-        <p v-if="successText" class="success">{{ successText }}</p>
-
-        <div v-if="normalizedPhotos.length" class="grid">
+        <div class="grid">
           <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
-              <button type="button" :disabled="isSaving" @click="setCover(p)">Зробити обкладинкою</button>
-              <button type="button" :disabled="isSaving" @click="removePhoto(p)"> Видалити</button>
+              <NavButton label="Обкладинка" variant="edit" :disabled="isSaving" @click="setCover(p)" />
+              <NavButton label="Видалити" variant="delete" :disabled="isSaving" @click="removePhoto(p)" />
             </div>
           </div>
         </div>
-
-        <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
       </div>
-
-      <p v-else class="admin-portfolio-else">Обери колекцію, щоб додати фото.</p>
     </template>
   </section>
 </template>
