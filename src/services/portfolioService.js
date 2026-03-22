@@ -189,3 +189,4 @@ export const deleteCollection = async (categoryId, collectionId) => {
     return false
   }
 }
+

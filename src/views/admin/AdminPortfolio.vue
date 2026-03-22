@@ -9,7 +9,7 @@ import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto } 
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
 import { getCategories, getCollection, setCollectionCoverImage, setCategoryCoverImage, setCollectionPhotos, setCollectionData, createCategory, updateCollection, deleteCategory, deleteCollection as deleteCollectionService } from '@/services/portfolioService'
-
+import { usePagination } from '@/composables/usePagination'
 const isLoading = ref(false)
 const isSaving = ref(false)
 const errorText = ref('')
@@ -87,6 +87,15 @@ const normalizedPhotos = computed(() => {
     })
     .filter((p) => p.url && String(p.url).trim() !== '')
 })
+const {
+  currentPage,
+  totalPages,
+  paginatedItems: paginatedPhotos,
+  nextPage,
+  prevPage,
+  goToPage,
+  reset
+} = usePagination(normalizedPhotos, 20)
 
 const load = async () => {
   errorText.value = ''
@@ -108,7 +117,10 @@ const loadSelectedCollection = async () => {
 }
 
 onMounted(load)
-watch([selectedCategoryId, selectedCollectionId], loadSelectedCollection)
+watch([selectedCategoryId, selectedCollectionId], async () => {
+  reset()
+  await loadSelectedCollection()
+})
 
 watch(selectedCategoryId, () => {
   const first = collectionOptions.value[0]?.id || ''
@@ -451,13 +463,10 @@ const deleteCurrentCategory = async (categoryId = selectedCategoryId.value) => {
   errorText.value = ''
   isSaving.value = true
   try {
-    // Видаляємо категорію з Firestore
     const ok = await deleteCategory(categoryId)
     if (!ok) {
       throw new Error('Не вдалося видалити категорію з бази')
     }
-
-    // Оновлюємо локальний стан
     categories.value = categories.value.filter(c => c.id !== categoryId)
     if (selectedCategoryId.value === categoryId) {
       selectedCategoryId.value = categories.value[0]?.id || ''
@@ -483,7 +492,6 @@ const editCurrentCategory = async () => {
     const cat = categories.value.find(c => c.id === selectedCategoryId.value)
     if (cat) {
       cat.name = newName.trim()
-      // Оновлюємо локально
       categories.value = [...categories.value]
     }
     successText.value = 'Категорію оновлено.'
@@ -501,7 +509,6 @@ const deleteCollection = async (collectionId) => {
   errorText.value = ''
   isSaving.value = true
   try {
-    // Видаляємо всі файли з storage
     const collection = await getCollection(selectedCategoryId.value, collectionId)
     const photos = Array.isArray(collection?.photos) ? collection.photos : []
     for (const photo of photos) {
@@ -515,7 +522,6 @@ const deleteCollection = async (collectionId) => {
       }
     }
 
-    // Видаляємо колекцію з Firestore
     const ok = await deleteCollectionService(selectedCategoryId.value, collectionId)
     if (!ok) {
       throw new Error('Не вдалося видалити колекцію з бази')
@@ -543,7 +549,6 @@ const editCollection = async (collectionId) => {
     const cat = categories.value.find(c => c.id === selectedCategoryId.value)
     if (cat?.collections?.[collectionId]) {
       cat.collections[collectionId].name = newName.trim()
-      // Оновлюємо назву в Firestore
       await updateCollection(selectedCategoryId.value, collectionId, { name: newName.trim() })
     }
     await load()
@@ -598,7 +603,6 @@ const deleteAllPhotosInCollection = async (collectionId) => {
     </template>
 
     <template v-else>
-      <!-- Нова категорія -->
       <div class="collections-header">
         <h2>Нова категорія</h2>
         <NavButton label="+" variant="add" @click="showNewCategoryForm = !showNewCategoryForm" />
@@ -612,7 +616,6 @@ const deleteAllPhotosInCollection = async (collectionId) => {
         </div>
       </div>
 
-      <!-- БЛОК 1: Категорії (як колекції) -->
       <AdminCategoryList
         :categories="categories"
         :selectedCategoryId="selectedCategoryId"
@@ -696,7 +699,7 @@ const deleteAllPhotosInCollection = async (collectionId) => {
         </div>
 
         <div class="grid">
-          <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
+          <div v-for="p in paginatedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
               <NavButton label="Обкладинка" variant="edit" :disabled="isSaving" @click="setCover(p)" />
@@ -704,6 +707,22 @@ const deleteAllPhotosInCollection = async (collectionId) => {
             </div>
           </div>
         </div>
+        <div v-if="totalPages > 1" class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1">←</button>
+
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            :class="{ active: page === currentPage }"
+            @click="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+
+          <button @click="nextPage" :disabled="currentPage === totalPages">→</button>
+        </div>
+        <p>Всього фото: {{ normalizedPhotos.length }}</p>
+        <p>Сторінка {{ currentPage }} з {{ totalPages }}</p>
       </div>
     </template>
   </section>
