@@ -87,6 +87,15 @@ const normalizedPhotos = computed(() => {
     })
     .filter((p) => p.url && String(p.url).trim() !== '')
 })
+const {
+  currentPage,
+  totalPages,
+  paginatedItems: paginatedPhotos,
+  nextPage,
+  prevPage,
+  goToPage,
+  reset
+} = usePagination(normalizedPhotos, 20)
 
 const isCoverPhoto = (photo) => {
   if (!photo || !selectedCollection.value) return false
