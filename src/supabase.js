@@ -24,23 +24,16 @@ const generateSafeFileName = (originalName) => {
   return `${timestamp}_${random}.${ext}`
 }
 
-// --- Функція завантаження фото ---
+// --- Функція завантаження фото категорії/колекції ---
 export async function uploadPhoto(file, categoryId, collectionId) {
-  if (!file) return null
+  if (!file || !categoryId || !collectionId) return null
 
   const safeCategory = categoryId.replace(/[^a-z0-9-_]/gi, '')
   const safeCollection = collectionId.replace(/[^a-z0-9-_]/gi, '')
 
   const safeName = generateSafeFileName(file.name)
+  const fileName = `${safeCategory}/${safeCollection}/photos/${safeName}`
 
-  const fileName =
-    `${safeCategory}/${safeCollection}/${safeName}`
-  const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName)
-  
-  return { 
-    publicUrl: urlData.publicUrl, // Повертаємо чисте посилання
-    fileName: fileName 
-  }
   // Завантаження файлу
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from('photos')
@@ -51,12 +44,63 @@ export async function uploadPhoto(file, categoryId, collectionId) {
     return null
   }
 
-  // Отримання URL (ОДИН раз оголошуємо змінні)
+  // Отримання URL
   const { data } = supabase.storage.from('photos').getPublicUrl(fileName)
   
-  return { 
-    publicUrl: data.publicUrl, 
-    fileName: fileName 
+  return {
+    publicUrl: data.publicUrl,
+    fileName: fileName
+  }
+}
+
+// --- Функція завантаження обкладинки категорії ---
+export async function uploadCategoryCover(file, categoryId) {
+  if (!file || !categoryId) return null
+
+  const safeCategory = categoryId.replace(/[^a-z0-9-_]/gi, '')
+  const safeName = generateSafeFileName(file.name)
+  const fileName = `${safeCategory}/cover/${safeName}`
+
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('photos')
+    .upload(fileName, file)
+
+  if (uploadError) {
+    console.error('Помилка завантаження:', uploadError.message)
+    return null
+  }
+
+  const { data } = supabase.storage.from('photos').getPublicUrl(fileName)
+
+  return {
+    publicUrl: data.publicUrl,
+    fileName: fileName
+  }
+}
+
+// --- Функція завантаження обкладинки колекції ---
+export async function uploadCollectionCover(file, categoryId, collectionId) {
+  if (!file || !categoryId || !collectionId) return null
+
+  const safeCategory = categoryId.replace(/[^a-z0-9-_]/gi, '')
+  const safeCollection = collectionId.replace(/[^a-z0-9-_]/gi, '')
+  const safeName = generateSafeFileName(file.name)
+  const fileName = `${safeCategory}/${safeCollection}/cover/${safeName}`
+
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('photos')
+    .upload(fileName, file)
+
+  if (uploadError) {
+    console.error('Помилка завантаження:', uploadError.message)
+    return null
+  }
+
+  const { data } = supabase.storage.from('photos').getPublicUrl(fileName)
+
+  return {
+    publicUrl: data.publicUrl,
+    fileName: fileName
   }
 }
 

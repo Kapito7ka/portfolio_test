@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { getCollection } from '@/services/portfolioService'
 import CollectionHeader from '@/components/CollectionHeader.vue'
 import CollectionGallery from '@/components/CollectionGallery.vue'
-
+import { usePagination } from '@/composables/usePagination'
 const route = useRoute()
 const isLoading = ref(false)
 const collection = ref(null)
@@ -24,6 +24,15 @@ const photos = computed(() => {
     })
     .filter((p) => p.url && String(p.url).trim() !== '')
 })
+
+const {
+  currentPage,
+  totalPages,
+  paginatedItems: paginatedPhotos,
+  nextPage,
+  prevPage,
+  goToPage
+} = usePagination(photos, 20)
 
 const load = async () => {
   if (!categoryId.value || !collectionId.value) {
@@ -55,11 +64,30 @@ watch([categoryId, collectionId], load)
     <template v-else-if="collection">
       <CollectionHeader :collection="collection" />
       <CollectionGallery
-        :photos="photos"
+        :photos="paginatedPhotos"
         :fallback-image="collection.image"
         :name="collection.name"
       />
+      <div v-if="totalPages > 1" class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">
+        ←
+      </button>
+
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        :class="{ active: page === currentPage }"
+        @click="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        →
+      </button>
+    </div>
     </template>
+    
 
     <template v-else>
       <p>Колекцію не знайдено.</p>
