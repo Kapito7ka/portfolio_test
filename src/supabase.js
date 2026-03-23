@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import.meta.env.VITE_SUPABASE_URL
 
 // Підключення через змінні оточення
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL

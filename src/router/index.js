@@ -22,22 +22,32 @@ const router = createRouter({
     { path: '/admin/portfolio', name: 'AdminPortfolio', component: AdminPortfolio },
     { path: '/admin/about', name: 'AdminAbout', component: () => import('@/views/admin/AdminAbout.vue')},
     { path: '/admin/contacts', name: 'AdminContacts', component: AdminContacts },
-    { path: '/admin', component: AdminPortfolio, meta: { requiresAuth: true }}
+    { path: '/admin', component: AdminPortfolio, meta: { requiresAuth: true }},
+    {path: '/admin/slides',name: 'AdminSlides',component: () => import('@/views/admin/AdminSlides.vue'),meta: { requiresAuth: true }}
   ]
 })
 router.beforeEach(async (to, from, next) => {
-  const { data } = await supabase.auth.getUser()
-  const user = data.user
-  const allowedEmails = ['my.post@gmail.com']
+  const { data: { user } } = await supabase.auth.getUser()
+  const loginTime = localStorage.getItem('login_time')
+  const oneDay = 24 * 60 * 60 * 1000 
+
+  // Якщо минуло більше доби з моменту запису часу входу
+  if (loginTime && (Date.now() - parseInt(loginTime) > oneDay)) {
+    localStorage.removeItem('login_time')
+    await supabase.auth.signOut()
+    return next('/login')
+  }
+  // перевірка email...
+  const allowedEmail = import.meta.env.VITE_ALLOWED_EMAIL
   if (to.path.startsWith('/admin')) {
-    if (!user || !allowedEmails.includes(user.email)) {
-      if (user) await supabase.auth.signOut() 
-      next('/login')
+    if (user && user.email === allowedEmail) {
+      next()
     } else {
-      next() // Все ок, пускаємо
+      if (user) await supabase.auth.signOut()
+      next({ path: '/login', query: { error: 'access_denied' } })
     }
   } else {
-    next() // Звичайні сторінки доступні всім
+    next()
   }
 })
 export default router
