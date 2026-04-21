@@ -60,9 +60,9 @@ const { data, error } = await supabase
 <style scoped>
 .main-slider {
   width: 100%;
-  height: 80vh; 
+  height: 70vh; 
   min-height: 400px;
-  margin-bottom: 2rem;
+  margin: 0 0 60px 0;
 }
 
 /* Стиль самого слайда */
@@ -80,9 +80,11 @@ const { data, error } = await supabase
 
 .hero-slide h2 {
   color: white;
-  font-size: 3rem;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  font-size: 3.5rem;
+  text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.4);
   z-index: 2;
+  font-weight: 300;
+  letter-spacing: 1px;
 }
 
 .hero-slide::after {
@@ -92,16 +94,44 @@ const { data, error } = await supabase
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.portfolio-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
 }
 
 /* Адаптація під мобільні пристрої */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .main-slider {
-    height: 50vh;
+    height: 55vh;
   }
   .hero-slide h2 {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-slider {
+    height: 45vh;
+  }
+  .hero-slide h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-slider {
+    height: 40vh;
+    margin-bottom: 40px;
+  }
+  .hero-slide h2 {
+    font-size: 1.2rem;
+  }
+  .portfolio-section {
+    padding: 0 20px 40px;
   }
 }
 </style>

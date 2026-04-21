@@ -6,7 +6,5 @@ defineProps({
 </script>
 
 <template>
-  <div class="base-image-container">
-    <img :src="src" :alt="alt" class="base-image" />
-  </div>
+  <img :src="src" :alt="alt" class="base-image" />
 </template>

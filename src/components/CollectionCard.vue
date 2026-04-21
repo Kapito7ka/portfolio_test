@@ -9,7 +9,7 @@ defineProps({
 })
 </script>
 <template>
-  <div class="grid">
+  <div class="collection-card-wrapper">
     <RouterLink
       v-for="item in collectionsList"
       :key="item.id"

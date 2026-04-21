@@ -30,13 +30,13 @@ const switchLanguage = (lang) => {
 </script>
 <template>
   <section>
-    <h1>Про нас</h1>
-    <div>
+    <h1>About Me</h1>
+    <div class="language-toggle">
       <BaseButton label="UA" @click="switchLanguage('ua')"/>
       <BaseButton label="EN" @click="switchLanguage('en')"/>
     </div>
-    <BaseImage v-if="image" :src="image" alt="Фото фотографа"/>
-    <h2>{{ name || 'Завантаження...' }}</h2>
+    <BaseImage v-if="image" :src="image" alt="Photographer"/>
+    <h2>{{ name || 'Loading...' }}</h2>
     <p>{{ desc }}</p>
   </section>
 </template>

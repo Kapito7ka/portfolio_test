@@ -87,6 +87,17 @@ const normalizedPhotos = computed(() => {
     })
     .filter((p) => p.url && String(p.url).trim() !== '')
 })
+
+const isCoverPhoto = (photo) => {
+  if (!photo || !selectedCollection.value) return false
+  const coverFileName = selectedCollection.value.coverFileName || ''
+  const coverUrl = selectedCollection.value.image || ''
+  if (coverFileName && photo.fileName) {
+    return photo.fileName === coverFileName
+  }
+  return coverUrl ? photo.url === coverUrl : false
+}
+
 const {
   currentPage,
   totalPages,
@@ -351,7 +362,7 @@ const removePhoto = async (photo) => {
 }
 
 const setCover = async (photo) => {
-  if (!photo?.url || !photo?.fileName) return
+  if (!photo?.url) return
   if (!selectedCategoryId.value || !selectedCollectionId.value) return
 
   errorText.value = ''
@@ -361,15 +372,16 @@ const setCover = async (photo) => {
 
   try {
     const oldCoverFileName = currentCategory.value?.collections?.[selectedCollectionId.value]?.coverFileName || ''
+    const coverFileName = photo.fileName || ''
 
     await setCollectionCoverImage(
       selectedCategoryId.value,
       selectedCollectionId.value,
       photo.url,
-      photo.fileName
+      coverFileName
     )
 
-    if (oldCoverFileName && oldCoverFileName !== photo.fileName) {
+    if (oldCoverFileName && coverFileName && oldCoverFileName !== coverFileName) {
       try {
         await deletePhoto(oldCoverFileName)
       } catch (err) {
@@ -702,7 +714,13 @@ const deleteAllPhotosInCollection = async (collectionId) => {
           <div v-for="p in paginatedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
-              <NavButton label="Обкладинка" variant="edit" :disabled="isSaving" @click="setCover(p)" />
+              <NavButton
+                v-if="!isCoverPhoto(p)"
+                label="Обкладинка"
+                variant="edit"
+                :disabled="isSaving"
+                @click="setCover(p)"
+              />
               <NavButton label="Видалити" variant="delete" :disabled="isSaving" @click="removePhoto(p)" />
             </div>
           </div>

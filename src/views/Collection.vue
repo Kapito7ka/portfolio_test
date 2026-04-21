@@ -54,11 +54,11 @@ watch([categoryId, collectionId], load)
       :to="{ name: 'CategoryCollections', params: { categoryId } }"
       class="back-link"
     >
-      ← Назад до колекцій
+      ← Go back to collections
     </RouterLink>
 
     <template v-if="isLoading">
-      <p>Завантаження...</p>
+      <p>Loading...</p>
     </template>
 
     <template v-else-if="collection">
@@ -90,7 +90,7 @@ watch([categoryId, collectionId], load)
     
 
     <template v-else>
-      <p>Колекцію не знайдено.</p>
+      <p>Collection not found.</p>
     </template>
   </section>
 </template>

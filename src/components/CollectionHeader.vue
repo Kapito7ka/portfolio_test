@@ -12,7 +12,7 @@ const props = defineProps({
     <h1>{{ collection.name }}</h1>
     <p v-if="collection.location">{{ collection.location }}</p>
     <p v-if="collection.categoryName" class="category-label">
-      Категорія: {{ collection.categoryName }}
+      Category: {{ collection.categoryName }}
     </p>
   </header>
 </template>

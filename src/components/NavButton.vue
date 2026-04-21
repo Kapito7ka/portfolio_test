@@ -1,5 +1,6 @@
 <template>
   <button 
+    type="button"
     class="nav-button"
     :class="[variant, { active: isActive, disabled }]"
     :disabled="disabled"
@@ -34,7 +35,10 @@ export default {
   emits: ['click'],
   methods: {
     handleClick(event) {
-      this.$emit('click', event);
+      if (event && event.preventDefault) {
+        event.preventDefault()
+      }
+      this.$emit('click', event)
     }
   }
 }

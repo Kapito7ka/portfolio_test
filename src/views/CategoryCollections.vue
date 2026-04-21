@@ -45,22 +45,20 @@ watch(categoryId, load)
       :to="{ name: 'Portfolio' }"
       class="back-link"
     >
-      ← Назад до категорій
+      ← Go back to categories
     </RouterLink>
 
     <template v-if="isLoading">
-      <p>Завантаження...</p>
+      <p>Loading...</p>
     </template>
 
     <template v-else-if="category">
       <h1>{{ category.name || category.id }}</h1>
-      <div class="grid collections-grid">
-        <CollectionCard :collections-list="collectionsList" />
-      </div>
+      <CollectionCard :collections-list="collectionsList" />
     </template>
 
     <template v-else>
-      <p>Категорію не знайдено.</p>
+      <p>Category not found.</p>
     </template>
   </section>
 </template>
