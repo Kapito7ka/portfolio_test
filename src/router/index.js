@@ -23,7 +23,8 @@ const router = createRouter({
     { path: '/admin/about', name: 'AdminAbout', component: () => import('@/views/admin/AdminAbout.vue')},
     { path: '/admin/contacts', name: 'AdminContacts', component: AdminContacts },
     { path: '/admin', component: AdminPortfolio, meta: { requiresAuth: true }},
-    {path: '/admin/slides',name: 'AdminSlides',component: () => import('@/views/admin/AdminSlides.vue'),meta: { requiresAuth: true }}
+    {path: '/admin/slides',name: 'AdminSlides',component: () => import('@/views/admin/AdminSlides.vue'),meta: { requiresAuth: true }},
+    {path: '/admin/bookings', name: 'AdminBookings', component: () => import('@/views/admin/AdminBookings.vue'), meta: { requiresAuth: true }}
   ]
 })
 router.beforeEach(async (to, from, next) => {
