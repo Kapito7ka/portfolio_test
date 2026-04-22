@@ -29,14 +29,24 @@ const switchLanguage = (lang) => {
 }
 </script>
 <template>
-  <section>
-    <h1>About Me</h1>
+  <section class="about-page">
+    <h1 class="page-title">About Me</h1>
+
     <div class="language-toggle">
       <BaseButton label="UA" @click="switchLanguage('ua')"/>
       <BaseButton label="EN" @click="switchLanguage('en')"/>
     </div>
-    <BaseImage v-if="image" :src="image" alt="Photographer"/>
-    <h2>{{ name || 'Loading...' }}</h2>
-    <p>{{ desc }}</p>
+
+    <div class="about-container">
+      <div class="about-text-content">
+        <p class="greeting">Привіт! Мене звати</p>
+        <h2 class="photographer-name">{{ name || 'Loading...' }}</h2>
+        <p class="main-description">{{ desc }}</p>
+        <router-link to="/contacts" class="contact-link">CONTACT ME</router-link>
+      </div>
+      <div class="about-image-wrapper">
+        <BaseImage v-if="image" :src="image" alt="Photographer" class="base-image"/>
+      </div>
+    </div>
   </section>
 </template>
