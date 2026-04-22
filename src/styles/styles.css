@@ -139,15 +139,17 @@ p {
 
 /* Base Image */
 .base-image-container {
-  margin: 0;
+  margin: 12px 0;
 }
 
 .base-image {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
+  width: 100%;             
+  max-width: 450px;        
+  height: 500px;           
+  object-fit: cover;       
+  border-radius: 0;        
   display: block;
-  object-fit: cover;
+  margin-left: auto;
 }
 
 /* Lists */
@@ -553,6 +555,36 @@ header .category-label {
   margin-bottom: 30px;
 }
 
+.about-container {
+  display: flex;
+  align-items: center;    
+  justify-content: space-between;
+  gap: 60px;              
+  max-width: 1200px;
+  margin: 40px auto;
+}
+.about-text-content {
+  flex: 1;               
+  text-align: left;
+}
+
+.greeting {
+  font-family: Georgia, serif;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.photographer-name {
+  font-size: 2.5rem;
+  font-family: Georgia, serif;
+  margin-top: 0;
+  font-weight: 400;
+}
+.about-image-wrapper {
+  flex: 1;               
+  display: flex;
+  justify-content: flex-end;
+}
 /* ----- Contacts Page ----- */
 .contacts-page {
   max-width: 600px;
@@ -566,6 +598,24 @@ header .category-label {
   text-align: center;
   margin-bottom: 40px;
   letter-spacing: 0.5px;
+}
+
+.contact-link {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 30px;
+  border: 1px solid #000;
+  text-decoration: none;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.contact-link:hover {
+  background: #000;
+  color: #fff;
 }
 
 .booking-form {
