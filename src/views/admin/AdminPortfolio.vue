@@ -107,16 +107,6 @@ const isCoverPhoto = (photo) => {
   return coverUrl ? photo.url === coverUrl : false
 }
 
-const {
-  currentPage,
-  totalPages,
-  paginatedItems: paginatedPhotos,
-  nextPage,
-  prevPage,
-  goToPage,
-  reset
-} = usePagination(normalizedPhotos, 20)
-
 const load = async () => {
   errorText.value = ''
   isLoading.value = true
@@ -539,7 +529,6 @@ const createCategoryHandler = async () => {
         </div>
 
         <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
-      </div>
-    </template>
-  </section>
-</template>
+      </template>
+    </section>
+  </template>

@@ -26,9 +26,9 @@ const handleLogout = async () => {
 
 <template>
   <nav class="nav">
-    <RouterLink to="/" class="nav-item">Портфоліо</RouterLink>
-    <RouterLink to="/about" class="nav-item">Про нас</RouterLink>
-    <RouterLink to="/contacts" class="nav-item">Контакти</RouterLink>
+    <RouterLink to="/">portfolio</RouterLink>
+    <RouterLink to="/about">about me</RouterLink>
+    <RouterLink to="/contacts">contacts</RouterLink>
 
     <template v-if="user">
       <span class="divider">|</span>
@@ -40,39 +40,75 @@ const handleLogout = async () => {
       <button @click="handleLogout" class="logout-btn">Вийти</button>
     </template>
 
-    <RouterLink v-else to="/login" class="login-link">Увійти</RouterLink>
+    <RouterLink v-else to="/login" class="login-link">Login</RouterLink>
   </nav>
 </template>
 
 <style scoped>
 .nav {
   display: flex;
+  gap: 40px;
+  justify-content: center;
+  background: transparent;
+  padding: 0;
   align-items: center;
-  gap: 15px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #ddd;
 }
-.nav-item { text-decoration: none; color: #333; font-weight: 500; }
-.admin { color: #d9534f; }
-.divider { color: #ccc; }
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #ff6b6b;
+}
+
+.nav-item.router-link-active {
+  color: #ff6b6b;
+}
+
+.nav-item.admin {
+  color: #333;
+}
+
+.nav-item.admin:hover {
+  color: #ff6b6b;
+}
+
+.divider {
+  color: #ccc;
+}
 
 .logout-btn {
-  margin-left: auto;
-  background: #ff4d4d;
-  color: white;
+  text-decoration: none;
+  color: #333;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  background: none;
   border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.login-link {
-  margin-left: auto;
+.logout-btn:hover {
+  color: #ff6b6b;
+}
+
+a.login-link {
   text-decoration: none;
-  background: #28a745;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 4px;
+  color: #333;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+a.login-link:hover {
+  color: #ff6b6b;
 }
 </style>
