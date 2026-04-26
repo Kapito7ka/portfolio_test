@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import { supabase } from '@/supabase'
 import { getContacts } from '@/services/contactsService'
 import ContactList from '@/components/ContactList.vue'
+import '@/styles/Contacts.css'
+import { Instagram, Send, MessageCircle } from 'lucide-vue-next'
 const contacts = ref(null)
 onMounted(async () => {
   contacts.value = await getContacts()
@@ -55,52 +57,67 @@ const sendBooking = async () => {
 </script>
 
 <template>
-  <section>
-    <h1>Contacts</h1>
-    <ContactList :contacts="contacts" />
-  </section>
   <div class="contacts-page">
-    <h2>Send a Booking Request</h2>
-    
-    <form @submit.prevent="sendBooking" class="booking-form">
-      <div class="form-group">
-        <label>Your Name</label>
-        <input v-model="formData.full_name" type="text" required placeholder="Full Name">
+    <section class="contacts-info-section">
+      <h1>Contacts</h1>
+      
+      <div class="contact-methods">
+        <p class="email-text">photog@example.com</p>
+        <p class="phone-text">+380 97 000 00 00</p>
       </div>
-
-      <div class="form-group">
-        <label>Preferred Date</label>
-        <input v-model="formData.booking_date" type="date" required>
+      <div class="social-grid">
+        <a href="https://instagram.com/..." target="_blank" class="social-link-btn">
+          <Instagram :size="16" stroke-width="1.5" />
+          <span>Instagram</span>
+        </a>
+        <a href="https://t.me/..." target="_blank" class="social-link-btn">
+          <Send :size="16" stroke-width="1.5" />
+          <span>Telegram</span>
+        </a>
+        <a href="https://wa.me/..." target="_blank" class="social-link-btn">
+          <MessageCircle :size="16" stroke-width="1.5" />
+          <span>WhatsApp</span>
+        </a>
       </div>
+    </section>
 
-      <div class="form-group">
-        <label>Location</label>
-        <input v-model="formData.location" type="text" required placeholder="City or specific location">
-      </div>
+    <section class="booking-section">
+      <h2 class="form-title">Send a Booking Request</h2>
+      
+      <form @submit.prevent="sendBooking" class="booking-form">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input v-model="formData.full_name" type="text" required placeholder="Full Name">
+        </div>
 
-      <div class="form-group">
-        <label>Phone</label>
-        <input v-model="formData.phone" type="tel" required placeholder="+1...">
-      </div>
+        <div class="form-group">
+          <label>Preferred Date</label>
+          <input v-model="formData.booking_date" type="date" required>
+        </div>
 
-      <div class="form-group">
-        <label>Additional Questions</label>
-        <textarea v-model="formData.extra_questions" rows="4"></textarea>
-      </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input v-model="formData.location" type="text" required placeholder="City or specific location">
+        </div>
 
-      <button type="submit" :disabled="isSending">
-        {{ isSending ? 'Sending...' : 'Book Now' }}
-      </button>
+        <div class="form-group">
+          <label>Phone</label>
+          <input v-model="formData.phone" type="tel" required placeholder="+380...">
+        </div>
 
-      <p v-if="statusMsg.text" :class="statusMsg.type">{{ statusMsg.text }}</p>
-    </form>
+        <div class="form-group">
+          <label>Additional Questions</label>
+          <textarea v-model="formData.extra_questions" rows="4"></textarea>
+        </div>
+
+        <button type="submit" :disabled="isSending" class="submit-btn">
+          {{ isSending ? 'Sending...' : 'Book Now' }}
+        </button>
+
+        <p v-if="statusMsg.text" :class="statusMsg.type" class="status-message">
+          {{ statusMsg.text }}
+        </p>
+      </form>
+    </section>
   </div>
 </template>
-<style scoped>
-.booking-form { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-.form-group { display: flex; flex-direction: column; text-align: left; }
-.success { color: green; }
-.error { color: red; }
-button { background: #333; color: white; padding: 10px; border: none; cursor: pointer; }
-button:disabled { background: #ccc; }
-</style>
