@@ -26,6 +26,7 @@ const handleLogout = async () => {
 
 <template>
   <nav class="nav">
+    <RouterLink to="/slides">slides</RouterLink>
     <RouterLink to="/">portfolio</RouterLink>
     <RouterLink to="/about">about me</RouterLink>
     <RouterLink to="/contacts">contacts</RouterLink>

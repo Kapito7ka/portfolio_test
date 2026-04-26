@@ -9,6 +9,7 @@ import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto } 
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
 import { getCategories, getCollection, setCollectionCoverImage, setCollectionPhotos, createCategory } from '@/services/portfolioService'
+import { usePagination } from '@/composables/usePagination'
 
 const isLoading = ref(false)
 const isSaving = ref(false)
@@ -522,7 +523,14 @@ const createCategoryHandler = async () => {
           <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
             <BaseImage :src="p.url" :alt="selectedCollection.name" />
             <div class="photoActions">
-              <button type="button" :disabled="isSaving" @click="setCover(p)">Зробити обкладинкою</button>
+              <button
+                v-if="!isCoverPhoto(p)"
+                type="button"
+                :disabled="isSaving"
+                @click="setCover(p)"
+              >
+                Зробити обкладинкою
+              </button>
               <button type="button" :disabled="isSaving" @click="removePhoto(p)"> Видалити</button>
             </div>
           </div>
