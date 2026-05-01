@@ -9,6 +9,18 @@
   
   <main class="container">
     <RouterView />
+  <footer class="footer-strip">
+    <div class="footer-container">
+      <div class="footer-contacts">
+        <a href="tel:+380970000000">+380 97 000 00 00</a>
+        <span class="dot">•</span>
+        <a href="mailto:contact@rybinskyi.com">contact@google.com</a>
+      </div>
+      <div class="footer-socials">
+        <router-link to="/contacts">Контакти</router-link>
+      </div>
+    </div>
+  </footer>
   </main>
 </template>
 

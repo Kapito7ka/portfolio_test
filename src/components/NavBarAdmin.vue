@@ -26,7 +26,7 @@ const handleLogout = async () => {
 
 <template>
   <nav class="nav">
-    <RouterLink to="/slides">slides</RouterLink>
+    <RouterLink to="/slides">home</RouterLink>
     <RouterLink to="/">portfolio</RouterLink>
     <RouterLink to="/about">about me</RouterLink>
     <RouterLink to="/contacts">contacts</RouterLink>
@@ -36,7 +36,7 @@ const handleLogout = async () => {
       <RouterLink to="/admin/portfolio" class="nav-item admin">Адмін портфоліо</RouterLink>
       <RouterLink to="/admin/about" class="nav-item admin">Адмін про нас</RouterLink>
       <RouterLink to="/admin/contacts" class="nav-item admin">Адмін контакти</RouterLink>
-      <RouterLink to="/admin/slides" class="nav-item admin">Адмін слайди</RouterLink>
+      <RouterLink to="/admin/home" class="nav-item admin">Адмін слайди</RouterLink>
       <RouterLink to="/admin/bookings" class="nav-item admin">Заявки</RouterLink>
       <button @click="handleLogout" class="logout-btn">Вийти</button>
     </template>

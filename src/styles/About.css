@@ -1,0 +1,35 @@
+.language-bar {
+  position: absolute;
+  top: 20px;
+  right: 40px; 
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.language-bar button {
+  background: none;
+  border: none;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.language-bar button.active {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.flag-icon {
+  font-size: 16px;
+}
+
+.divider {
+  color: #e5e5e5;
+}

@@ -3,11 +3,16 @@ import { ref, onMounted, computed } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 import BaseImage from '@/components/BaseImage.vue'
+import '@/styles/About.css'
 const fullName = ref({ ua: '', en: '' })
 const description = ref({ ua: '', en: '' })
 
 const image = ref(null)
 const language = ref('ua')
+
+const setLanguage = (lang) => {
+  language.value = lang
+}
 
 const name = computed(() => fullName.value[language.value] || '')
 const desc = computed(() => description.value[language.value] || '')
@@ -26,9 +31,18 @@ onMounted(async () => {
 </script>
 <template>
   <section class="about-page">
+    <div class="language-bar">
+      <button @click="setLanguage('ua')" :class="{ active: language === 'ua' }">
+        <span class="flag-icon">UA</span> 
+      </button>
+      <span class="divider">|</span>
+      <button @click="setLanguage('en')" :class="{ active: language === 'en' }">
+        <span class="flag-icon">EN</span> 
+      </button>
+    </div>
     <div class="about-container">
       <div class="about-text-content">
-        <p class="greeting">Привіт! Мене звати</p>
+        <p class="greeting">{{ language === 'ua' ? 'Привіт! Мене звати' : 'Hi! My name is' }}</p>
         <h2 class="photographer-name">{{ name || 'Loading...' }}</h2>
         <p class="main-description">{{ desc }}</p>
         <router-link to="/contacts" class="contact-link">CONTACT ME</router-link>

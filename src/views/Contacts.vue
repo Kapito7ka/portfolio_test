@@ -107,7 +107,8 @@ const sendBooking = async () => {
 
         <div class="form-group">
           <label>Additional Questions</label>
-          <textarea v-model="formData.extra_questions" rows="4"></textarea>
+          <textarea v-model="formData.extra_questions" maxlength="300" placeholder="Ваш запит..."rows="4"></textarea>
+          <small v-if="formData.extra_questions">{{ formData.extra_questions.length }}/300</small>
         </div>
 
         <button type="submit" :disabled="isSending" class="submit-btn">
