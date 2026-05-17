@@ -1,8 +1,6 @@
 <template>
-  <header class="header">
+  <header :class="['header', { 'header--home': isHome }]">
     <div class="header-inner">
-      <div class="logo">PARLBOCHYI</div>
-      <div class="logo-subtitle">P  O  R  T  O  G  R  A  P  H  Y</div>
       <NavBar />
     </div>
   </header>
@@ -25,21 +23,63 @@
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
 import NavBar from '@/components/NavBarAdmin.vue'
+
+const route = useRoute()
+const isHome = computed(() => route.name === 'Home')
 </script>
 
 <style>
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #ffffff;
-  color: #1a1a1a;
+  background-color: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+html, body, #app {
+  width: 100%;
+  min-width: 100%;
 }
 
 .container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 96px 0 0;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  backdrop-filter: none;
+}
+
+.header .nav-link,
+.header .nav-link.router-link-active {
+  color: #222;
+}
+
+.header--home {
+  background: transparent;
+}
+
+.header--home .nav-link,
+.header--home .nav-link.router-link-active {
+  color: #fff;
+}
+
+.header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0;
+  padding: 18px 20px 14px;
 }
 </style>

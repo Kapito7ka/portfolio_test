@@ -33,11 +33,11 @@ onMounted(async () => {
   <section class="about-page">
     <div class="language-bar">
       <button @click="setLanguage('ua')" :class="{ active: language === 'ua' }">
-        <span class="flag-icon">UA</span> 
+        <span class="flag-icon">UA</span>
       </button>
       <span class="divider">|</span>
       <button @click="setLanguage('en')" :class="{ active: language === 'en' }">
-        <span class="flag-icon">EN</span> 
+        <span class="flag-icon">EN</span>
       </button>
     </div>
     <div class="about-container">
@@ -45,7 +45,7 @@ onMounted(async () => {
         <p class="greeting">{{ language === 'ua' ? 'Привіт! Мене звати' : 'Hi! My name is' }}</p>
         <h2 class="photographer-name">{{ name || 'Loading...' }}</h2>
         <p class="main-description">{{ desc }}</p>
-        <router-link to="/contacts" class="contact-link">CONTACT ME</router-link>
+        <router-link to="/contacts" class="contact-link">GET IN TOUCH</router-link>
       </div>
       <div class="about-image-wrapper">
         <BaseImage v-if="image" :src="image" alt="Photographer" class="portrait-image" />
@@ -56,49 +56,52 @@ onMounted(async () => {
 
 <style scoped>
 .about-page {
+  position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 56px 28px 90px;
+  padding: 70px 28px 90px;
+  font-family: 'Georgia', serif;
 }
 
-.about-container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 84px;
+.about-page h1 {
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  font-weight: 400;
+  font-size: 24px;
+  margin: 0 0 40px;
+  color: #111;
+  text-align: center;
 }
 
 .about-text-content {
   flex: 1;
-  max-width: 530px;
-  padding-top: 24px;
+  max-width: 560px;
+  text-align: left;
+  padding-top: 8px;
 }
 
 .greeting {
-  margin: 0 0 6px;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 24px;
-  line-height: 1.15;
-  color: #868a95;
-  font-weight: 300;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
+  color: #666;
 }
 
 .photographer-name {
-  margin: 0 0 78px;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 40px;
-  line-height: 1.06;
-  color: #616674;
+  margin: 0 0 28px;
+  font-size: 38px;
+  line-height: 1.1;
+  color: #1a1a1a;
   font-weight: 400;
 }
 
 .main-description {
   margin: 0;
-  max-width: 520px;
-  font-family: Georgia, 'Times New Roman', serif;
+  max-width: 540px;
   font-size: 16px;
-  line-height: 1.45;
-  color: #8a8f9b;
+  line-height: 1.75;
+  color: #333;
   white-space: pre-line;
 }
 
@@ -106,25 +109,32 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 54px;
-  padding: 14px 24px;
-  border: 1px solid #b3b7c0;
+  margin-top: 38px;
+  padding: 12px 30px;
+  border: 1px solid #000;
   text-decoration: none;
-  color: #767b87;
-  letter-spacing: 0.04em;
+  color: #000;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  font-size: 14px;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  font-size: 11px;
+  transition: all 0.3s ease;
+  background: transparent;
 }
 
 .contact-link:hover {
-  background-color: #6f7482;
+  background: #000;
   color: #fff;
-  border-color: #6f7482;
+}
+
+.about-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 72px;
 }
 
 .about-image-wrapper {
-  width: min(44vw, 620px);
+  width: min(43vw, 520px);
   min-width: 360px;
   flex-shrink: 0;
 }
@@ -133,77 +143,66 @@ onMounted(async () => {
   display: block;
   width: 100%;
   height: auto;
-  border: 2px solid #8c909b;
+  border: 1px solid #ddd;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
   .about-page {
-    padding-top: 40px;
+    padding: 56px 20px;
   }
 
-  .about-container {
-    gap: 48px;
-  }
-
-  .greeting {
-    font-size: 22px;
+  .about-page h1 {
+    margin-bottom: 38px;
   }
 
   .photographer-name {
-    font-size: 34px;
-    margin-bottom: 52px;
+    font-size: 32px;
   }
 
   .main-description {
     font-size: 15px;
   }
 
-  .contact-link {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 900px) {
   .about-container {
     flex-direction: column;
-    align-items: stretch;
+    gap: 36px;
   }
 
   .about-text-content {
     max-width: none;
-    padding-top: 0;
+    text-align: left;
   }
 
   .about-image-wrapper {
     width: 100%;
     min-width: 0;
     max-width: 560px;
-    margin: 0 auto;
   }
 }
 
 @media (max-width: 640px) {
   .about-page {
-    padding: 24px 18px 48px;
+    padding: 40px 18px 48px;
   }
 
-  .greeting {
+  .about-page h1 {
+    letter-spacing: 3px;
     font-size: 20px;
+    margin-bottom: 28px;
   }
 
   .photographer-name {
-    font-size: 30px;
-    margin-bottom: 30px;
+    font-size: 26px;
+    margin-bottom: 20px;
   }
 
   .main-description {
     font-size: 14px;
+    line-height: 1.65;
   }
 
   .contact-link {
-    margin-top: 36px;
-    font-size: 14px;
-    padding: 12px 18px;
+    margin-top: 30px;
   }
 }
 </style>

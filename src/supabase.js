@@ -53,6 +53,28 @@ export async function uploadPhoto(file, categoryId, collectionId) {
   }
 }
 
+// --- Фото для блоку Instagram на головній (під категоріями) ---
+export async function uploadInstagramSpotlightPhoto(file) {
+  if (!file) return null
+
+  const safeName = generateSafeFileName(file.name)
+  const fileName = `_site/instagram-spotlights/${safeName}`
+
+  const { error: uploadError } = await supabase.storage.from('photos').upload(fileName, file)
+
+  if (uploadError) {
+    console.error('Помилка завантаження:', uploadError.message)
+    return null
+  }
+
+  const { data } = supabase.storage.from('photos').getPublicUrl(fileName)
+
+  return {
+    publicUrl: data.publicUrl,
+    fileName
+  }
+}
+
 // --- Функція завантаження обкладинки категорії ---
 export async function uploadCategoryCover(file, categoryId) {
   if (!file || !categoryId) return null

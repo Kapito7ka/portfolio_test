@@ -26,14 +26,37 @@ export const getCollections = async () => {
   return allCollections
 }
 
+/** Підтримка рядка або об'єкта фото (url / publicUrl / src — як у адмінці). */
+const resolvePhotoRef = (p) => {
+  if (typeof p === 'string') return p.trim()
+  if (p && typeof p === 'object') {
+    const u = p.url || p.publicUrl || p.src || ''
+    return typeof u === 'string' ? u.trim() : ''
+  }
+  return ''
+}
+
+const firstCollectionCoverFromMap = (collections) => {
+  for (const col of Object.values(collections || {})) {
+    if (!col) continue
+    const cover = typeof col.image === 'string' ? col.image.trim() : ''
+    if (cover) return cover
+    if (Array.isArray(col.photos) && col.photos.length) {
+      const u = resolvePhotoRef(col.photos[0])
+      if (u) return u
+    }
+  }
+  return ''
+}
+
 export const getCategories = async () => {
   const snapshot = await getDocs(collection(db, 'categories'))
   const out = []
   snapshot.forEach((d) => {
     const data = d.data() || {}
     const collections = data.collections || {}
-    const firstCol = Object.values(collections).find((c) => c && (c.image || (c.photos && c.photos[0])))
-    const image = data.image || (firstCol && (firstCol.image || (firstCol.photos && firstCol.photos[0] && (typeof firstCol.photos[0] === 'string' ? firstCol.photos[0] : firstCol.photos[0]?.url))))
+    const categoryCover = typeof data.image === 'string' ? data.image.trim() : ''
+    const image = categoryCover || firstCollectionCoverFromMap(collections)
     out.push({ id: d.id, ...data, image: image || '' })
   })
   return out
@@ -186,6 +209,56 @@ export const deleteCollection = async (categoryId, collectionId) => {
     return true
   } catch (error) {
     console.error('Firestore error (deleteCollection):', error)
+    return false
+  }
+}
+
+const INSTAGRAM_SPOTLIGHTS_DOC = ['app_config', 'instagram_spotlights']
+
+const emptyInstagramSlots = () => [
+  { imageUrl: '', postUrl: '', fileName: '' },
+  { imageUrl: '', postUrl: '', fileName: '' },
+  { imageUrl: '', postUrl: '', fileName: '' }
+]
+
+/** До трьох елементів: превʼю та посилання на пост Instagram */
+export const getInstagramSpotlights = async () => {
+  try {
+    const snap = await getDoc(doc(db, ...INSTAGRAM_SPOTLIGHTS_DOC))
+    if (!snap.exists()) return emptyInstagramSlots()
+    const raw = snap.data()?.items
+    if (!Array.isArray(raw)) return emptyInstagramSlots()
+    const normalized = raw
+      .slice(0, 3)
+      .map((it) => ({
+        imageUrl: String(it?.imageUrl || '').trim(),
+        postUrl: String(it?.postUrl || '').trim(),
+        fileName: String(it?.fileName || '').trim()
+      }))
+    while (normalized.length < 3) {
+      normalized.push({ imageUrl: '', postUrl: '', fileName: '' })
+    }
+    return normalized
+  } catch (error) {
+    console.error('Firestore error (getInstagramSpotlights):', error)
+    return emptyInstagramSlots()
+  }
+}
+
+export const saveInstagramSpotlights = async (items) => {
+  try {
+    const cleaned = (Array.isArray(items) ? items : []).slice(0, 3).map((it) => ({
+      imageUrl: String(it?.imageUrl || '').trim(),
+      postUrl: String(it?.postUrl || '').trim(),
+      fileName: String(it?.fileName || '').trim()
+    }))
+    while (cleaned.length < 3) {
+      cleaned.push({ imageUrl: '', postUrl: '', fileName: '' })
+    }
+    await setDoc(doc(db, ...INSTAGRAM_SPOTLIGHTS_DOC), { items: cleaned }, { merge: true })
+    return true
+  } catch (error) {
+    console.error('Firestore error (saveInstagramSpotlights):', error)
     return false
   }
 }

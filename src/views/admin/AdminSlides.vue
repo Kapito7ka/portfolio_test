@@ -9,9 +9,16 @@ const isSaving = ref(false)
 const isLoading = ref(false)
 const errorText = ref('')
 const successText = ref('')
+const selectedPage = ref('home')
 
 const uploadProgress = ref(0)
 const uploadStatus = ref('')
+
+const parseSlidePage = (slide) => {
+  const fileName = String(slide?.image_url || '').split('/').pop() || ''
+  if (fileName.startsWith('portfolio-')) return 'portfolio'
+  return 'home'
+}
 
 const fetchSlides = async () => {
   isLoading.value = true
@@ -40,7 +47,8 @@ const handleUpload = async (event) => {
       
       // ВИПРАВЛЕННЯ "Invalid key": створюємо чисте ім'я файлу без кирилиці
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`
+      const pagePrefix = selectedPage.value === 'portfolio' ? 'portfolio' : 'home'
+      const fileName = `${pagePrefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`
 
       const { data: storageData, error: storageError } = await supabase.storage
         .from('slides')
@@ -101,6 +109,13 @@ onMounted(fetchSlides)
 
     <div class="block">
       <div class="row">
+        <label class="page-select">
+          Тип слайду:
+          <select v-model="selectedPage">
+            <option value="home">Home</option>
+            <option value="portfolio">Portfolio</option>
+          </select>
+        </label>
         <input type="file" multiple :disabled="isSaving" @change="handleUpload" accept="image/*" />
         <BaseButton v-if="isSaving" :label="uploadStatus" />
       </div>
@@ -120,6 +135,7 @@ onMounted(fetchSlides)
       <div v-for="slide in slides" :key="slide.id" class="photoCard">
         <BaseImage :src="slide.image_url" />
         <div class="photoActions">
+          <span>Сторінка: {{ parseSlidePage(slide) }}</span>
           <span>Порядок: {{ slide.order }}</span>
           <button @click="removeSlide(slide)" :disabled="isSaving">Видалити</button>
         </div>

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import Home from '../views/Home.vue'
 import Portfolio from '../views/Portfolio.vue'
-import Slides from '../views/Slides.vue'
 import About from '../views/About.vue'
 import Contacts from '../views/Contacts.vue'
 import AdminAbout from '../views/admin/AdminAbout.vue'
@@ -14,8 +14,9 @@ import LoginView from '@/views/LoginView.vue'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'Portfolio', component: Portfolio },
-    { path: '/slides', name: 'Slides', component: Slides },
+    { path: '/', name: 'Home', component: Home },
+    { path: '/portfolio', name: 'Portfolio', component: Portfolio },
+    { path: '/slides', redirect: '/' },
     { path: '/portfolio/:categoryId', name: 'CategoryCollections', component: () => import('../views/CategoryCollections.vue') },
     { path: '/collections/:categoryId/:collectionId', name: 'Collection', component: () => import('../views/Collection.vue') },
     { path: '/about', name: 'About', component: About },
