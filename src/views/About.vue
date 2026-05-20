@@ -62,6 +62,15 @@ onMounted(async () => {
   padding: 70px 28px 90px;
   font-family: 'Georgia', serif;
 }
+.about-content {
+  max-width: 1000px;
+  margin: 0 auto; /* Центрує блок на екрані */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  text-align: left; /* Текст біля фото залишається читабельним зліва */
+}
 
 .about-page h1 {
   text-transform: uppercase;
@@ -204,5 +213,16 @@ onMounted(async () => {
   .contact-link {
     margin-top: 30px;
   }
+}
+.about-page,
+.contacts-page,
+.login-page {
+  padding-top: calc(120px + 2rem); /* Динамічний відступ: висота хедера + м'який запас */
+  min-height: calc(100vh - 120px); /* Контент розтягується на весь екран мінус хедер */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Центрує вміст по вертикалі */
+  align-items: center;     /* Центрує вміст по горизонталі */
+  box-sizing: border-box;
 }
 </style>

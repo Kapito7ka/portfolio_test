@@ -168,3 +168,26 @@ export async function getUser() {
   const { data } = await supabase.auth.getUser()
   return data.user
 }
+const submitBooking = async () => {
+  try {
+    // Приводимо дату з інпуту до ISO формату, який чітко приймає Supabase
+    const formattedDate = new Date(form.value.date).toISOString().split('T')[0]; 
+    
+    const { data, error } = await supabase
+      .from('bookings') // Твоя виправлена таблиця
+      .insert([
+        {
+          name: form.value.name,
+          phone: form.value.phone,
+          date: formattedDate, // Передаємо вже чітко відформатовану дату (РРРР-ММ-ДД)
+          status: 'pending'    // Статус за замовчуванням
+        }
+      ]);
+
+    if (error) throw error;
+    
+    alert('Бронювання успішно надіслано!');
+  } catch (error) {
+    console.error('Помилка Supabase:', error.message);
+  }
+}

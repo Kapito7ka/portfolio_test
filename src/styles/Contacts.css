@@ -151,3 +151,14 @@
 
 .success { color: #067647; }
 .error { color: #b42318; }
+.about-page,
+.contacts-page,
+.login-page {
+  padding-top: calc(120px + 2rem); /* Динамічний відступ: висота хедера + м'який запас */
+  min-height: calc(100vh - 120px); /* Контент розтягується на весь екран мінус хедер */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Центрує вміст по вертикалі */
+  align-items: center;     /* Центрує вміст по горизонталі */
+  box-sizing: border-box;
+}

@@ -103,7 +103,8 @@ onMounted(async () => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.55));
+  /* Робимо верхній край темнішим (0.6), щоб білі літери шапки чітко читалися на будь-якому фото */
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 20%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
 }
 
