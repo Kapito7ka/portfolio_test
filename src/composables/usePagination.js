@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue'
 
-export function usePagination(items, perPage = 20) {
+export function usePagination(items, perPage = 10) {
   const currentPage = ref(1)
 
   const totalPages = computed(() => {

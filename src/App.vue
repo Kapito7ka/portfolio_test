@@ -5,20 +5,20 @@
     </div>
   </header>
   
-  <main class="container">
+  <main :class="['container', { 'container--home': isHome }]">
     <RouterView />
-  <footer class="footer-strip">
-    <div class="footer-container">
-      <div class="footer-contacts">
-        <a href="tel:+380970000000">+380 97 000 00 00</a>
-        <span class="dot">•</span>
-        <a href="mailto:contact@rybinskyi.com">contact@google.com</a>
+    <footer class="footer-strip">
+      <div class="footer-container">
+        <div class="footer-contacts">
+          <a href="tel:+380970000000">+380 97 000 00 00</a>
+          <span class="dot">•</span>
+          <a href="mailto:contact@rybinskyi.com">contact@google.com</a>
+        </div>
+        <div class="footer-socials">
+          <router-link to="/contacts">Контакти</router-link>
+        </div>
       </div>
-      <div class="footer-socials">
-        <router-link to="/contacts">Контакти</router-link>
-      </div>
-    </div>
-  </footer>
+    </footer>
   </main>
 </template>
 
@@ -49,18 +49,26 @@ html, body, #app {
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 96px 0 0;
+  padding: 0;
+}
+
+.container--home {
+  padding-top: 96px;
 }
 
 .header {
+  position: static;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.header--home {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  backdrop-filter: none;
+  background: transparent;
 }
 
 .header .nav-link,

@@ -175,14 +175,15 @@ li {
 .back-link {
   display: inline-block;
   margin-bottom: 30px;
-  color: #666;
+  color: #222;
   text-decoration: none;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 14px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
 }
 .back-link:hover {
-  color: #ff6b6b;
+  color: #000;
+  font-weight: 700;
 }
 
 /* ----- Portfolio (головна) ----- */
@@ -242,7 +243,7 @@ li {
 }
 
 .collection-card:hover .collection-card__title {
-  color: #ff6b6b;
+  color: #111;
 }
 
 .collection-card__image-wrap {

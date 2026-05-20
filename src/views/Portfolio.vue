@@ -305,7 +305,7 @@ function instagramPostHref(url) {
 }
 
 .category-tile:hover .category-tile__title {
-  color: #ff6b6b;
+  color: #111;
 }
 
 .ig-spotlights-section {
