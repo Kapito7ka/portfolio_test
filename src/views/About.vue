@@ -3,10 +3,12 @@ import { ref, onMounted, computed } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 import BaseImage from '@/components/BaseImage.vue'
-import '@/styles/About.css'
+// Якщо у файлі About.css є старі стилі, які все ламають, 
+// тимчасово закоментуй рядок нижче для перевірки:
+//import '@/styles/About.css'
+
 const fullName = ref({ ua: '', en: '' })
 const description = ref({ ua: '', en: '' })
-
 const image = ref(null)
 const language = ref('ua')
 
@@ -27,202 +29,149 @@ onMounted(async () => {
     image.value = data.image || null
   }
 })
-
 </script>
+
 <template>
-  <section class="about-page">
-    <div class="language-bar">
-      <button @click="setLanguage('ua')" :class="{ active: language === 'ua' }">
-        <span class="flag-icon">UA</span>
-      </button>
-      <span class="divider">|</span>
-      <button @click="setLanguage('en')" :class="{ active: language === 'en' }">
-        <span class="flag-icon">EN</span>
-      </button>
+  <section class="about-page-clean">
+    <div class="lang-switcher">
+      <button @click="setLanguage('ua')" :class="{ active: language === 'ua' }">UA</button>
+      <span class="slash">|</span>
+      <button @click="setLanguage('en')" :class="{ active: language === 'en' }">EN</button>
     </div>
-    <div class="about-container">
-      <div class="about-text-content">
-        <p class="greeting">{{ language === 'ua' ? 'Привіт! Мене звати' : 'Hi! My name is' }}</p>
-        <h2 class="photographer-name">{{ name || 'Loading...' }}</h2>
-        <p class="main-description">{{ desc }}</p>
-        <router-link to="/contacts" class="contact-link">GET IN TOUCH</router-link>
+
+    <div class="about-grid">
+      <div class="about-info">
+        <p class="intro-tag">{{ language === 'ua' ? 'Привіт! Мене звати' : 'Hi! My name is' }}</p>
+        <h2 class="profile-title">{{ name || 'Loading...' }}</h2>
+        <p class="profile-text">{{ desc }}</p>
+        <router-link to="/contacts" class="btn-contact">ЗВ'ЯЖІТЬСЯ З НАМИ</router-link>
       </div>
-      <div class="about-image-wrapper">
-        <BaseImage v-if="image" :src="image" alt="Photographer" class="portrait-image" />
+      
+      <div class="about-photo-box">
+        <BaseImage v-if="image" :src="image" alt="Photographer" class="img-responsive" />
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.about-page {
-  position: relative;
-  max-width: 1240px;
+/* Повністю новий ізольований клас, щоб старі стилі не заважали */
+.about-page-clean {
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 70px 28px 90px;
+  padding: 40px 20px;
+  box-sizing: border-box;
   font-family: 'Georgia', serif;
+  background-color: #ffffff; /* Робимо фон білим, як контент */
+  color: #000000;
 }
-.about-content {
-  max-width: 1000px;
-  margin: 0 auto; /* Центрує блок на екрані */
+
+.lang-switcher {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 30px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.lang-switcher button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  font-weight: bold;
+  padding: 2px 6px;
+}
+
+.lang-switcher button.active {
+  color: #000;
+}
+
+.slash {
+  color: #ccc;
+}
+
+.about-grid {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 40px;
-  text-align: left; /* Текст біля фото залишається читабельним зліва */
 }
 
-.about-page h1 {
-  text-transform: uppercase;
-  letter-spacing: 5px;
-  font-weight: 400;
-  font-size: 24px;
-  margin: 0 0 40px;
-  color: #111;
-  text-align: center;
-}
-
-.about-text-content {
+.about-info {
   flex: 1;
-  max-width: 560px;
-  text-align: left;
-  padding-top: 8px;
+  max-width: 500px;
 }
 
-.greeting {
-  margin: 0 0 8px;
+.intro-tag {
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 11px;
   color: #666;
+  margin: 0 0 10px 0;
 }
 
-.photographer-name {
-  margin: 0 0 28px;
-  font-size: 38px;
-  line-height: 1.1;
-  color: #1a1a1a;
+.profile-title {
+  font-size: 36px;
   font-weight: 400;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
 }
 
-.main-description {
-  margin: 0;
-  max-width: 540px;
-  font-size: 16px;
-  line-height: 1.75;
+.profile-text {
+  font-size: 15px;
+  line-height: 1.6;
   color: #333;
+  margin: 0 0 30px 0;
   white-space: pre-line;
 }
 
-.contact-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 38px;
-  padding: 12px 30px;
+.btn-contact {
+  display: inline-block;
+  padding: 12px 28px;
   border: 1px solid #000;
-  text-decoration: none;
-  color: #000;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-size: 11px;
-  transition: all 0.3s ease;
   background: transparent;
+  color: #000;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  transition: background 0.3s, color 0.3s;
 }
 
-.contact-link:hover {
+.btn-contact:hover {
   background: #000;
   color: #fff;
 }
 
-.about-container {
+.about-photo-box {
+  flex: 1;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 72px;
+  justify-content: center;
+  max-width: 500px;
 }
 
-.about-image-wrapper {
-  width: min(43vw, 520px);
-  min-width: 360px;
-  flex-shrink: 0;
-}
-
-.portrait-image {
-  display: block;
+/* Обмеження картинки, щоб вона не розтягувала сторінку */
+.img-responsive {
   width: 100%;
   height: auto;
-  border: 1px solid #ddd;
+  max-height: 400px; 
+  object-fit: contain;
 }
 
-@media (max-width: 900px) {
-  .about-page {
-    padding: 56px 20px;
+/* Мобільна адаптивність */
+@media (max-width: 768px) {
+  .about-grid {
+    flex-direction: column-reverse;
+    gap: 30px;
   }
-
-  .about-page h1 {
-    margin-bottom: 38px;
+  .about-info {
+    text-align: center;
+    max-width: 100%;
   }
-
-  .photographer-name {
-    font-size: 32px;
+  .profile-title {
+    font-size: 28px;
   }
-
-  .main-description {
-    font-size: 15px;
-  }
-
-  .about-container {
-    flex-direction: column;
-    gap: 36px;
-  }
-
-  .about-text-content {
-    max-width: none;
-    text-align: left;
-  }
-
-  .about-image-wrapper {
-    width: 100%;
-    min-width: 0;
-    max-width: 560px;
-  }
-}
-
-@media (max-width: 640px) {
-  .about-page {
-    padding: 40px 18px 48px;
-  }
-
-  .about-page h1 {
-    letter-spacing: 3px;
-    font-size: 20px;
-    margin-bottom: 28px;
-  }
-
-  .photographer-name {
-    font-size: 26px;
-    margin-bottom: 20px;
-  }
-
-  .main-description {
-    font-size: 14px;
-    line-height: 1.65;
-  }
-
-  .contact-link {
-    margin-top: 30px;
-  }
-}
-.about-page,
-.contacts-page,
-.login-page {
-  padding-top: calc(120px + 2rem); /* Динамічний відступ: висота хедера + м'який запас */
-  min-height: calc(100vh - 120px); /* Контент розтягується на весь екран мінус хедер */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Центрує вміст по вертикалі */
-  align-items: center;     /* Центрує вміст по горизонталі */
-  box-sizing: border-box;
 }
 </style>

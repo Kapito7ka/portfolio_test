@@ -1,12 +1,14 @@
 /* Contacts.css — Монохромний мінімалізм */
 
-/* Головний контейнер сторінки */
 .contacts-page {
     max-width: 800px;
     margin: 0 auto;
-    padding: 80px 20px;
+    /* Зменшили відступ знизу, щоб через подвійний хедер адмінки сторінка не випадала в скрол */
+    padding: 140px 20px 30px 20px; 
     text-align: center;
-    font-family: 'Georgia', serif; /* Для елегантності заголовків */
+    font-family: 'Georgia', serif;
+    box-sizing: border-box;
+    background-color: #ffffff;
 }
 
 .contacts-page h1 {
@@ -15,21 +17,20 @@
     font-weight: 400;
     font-size: 24px;
     margin-bottom: 40px;
+    color: #1a1a1a;
 }
 
-/* Секція інформації (Email, Телефон) */
 .contacts-info-section {
-    margin-bottom: 60px;
+    margin-bottom: 50px;
 }
 
 .contact-methods p {
     font-size: 18px;
-    color: #111;
+    color: #111111;
     margin: 10px 0;
     letter-spacing: 1px;
 }
 
-/* Кнопки соцмереж */
 .social-grid {
     display: flex;
     justify-content: center;
@@ -39,15 +40,13 @@
 }
 
 .social-link-btn {
-    display: inline-flex; /* Важливо для іконок */
-    align-items: center;  /* Центрує іконку по вертикалі */
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px;            /* Відстань між іконкою та текстом */
-    
-    /* Твої старі стилі */
+    gap: 10px;
     text-decoration: none;
-    color: #000;
-    border: 1px solid #000;
+    color: #000000;
+    border: 1px solid #000000;
     padding: 12px 30px;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -57,15 +56,14 @@
 }
 
 .social-link-btn:hover {
-    background: #000;
-    color: #fff;
+    background: #000000;
+    color: #ffffff;
 }
 
-/* Секція форми */
 .booking-section {
-    margin-top: 80px;
-    border-top: 1px solid #eee; /* Легка роздільна лінія */
-    padding-top: 60px;
+    margin-top: 50px;
+    border-top: 1px solid #eeeeee;
+    padding-top: 40px;
 }
 
 .form-title {
@@ -73,76 +71,94 @@
     letter-spacing: 3px;
     font-size: 18px;
     margin-bottom: 40px;
+    color: #1a1a1a;
 }
 
 .booking-form {
-    max-width: 500px;
+    max-width: 600px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 35px; /* Великий простір між полями */
+    gap: 28px; /* Оптимальний простір між елементами */
 }
 
-/* Стилізація груп полів */
 .form-group {
     display: flex;
     flex-direction: column;
+    width: 100%;
     text-align: left;
+    position: relative; /* Критично для правильного позиціонування лічильника */
 }
 
 .form-group label {
     text-transform: uppercase;
     letter-spacing: 2px;
     font-size: 10px;
-    color: #666;
+    color: #666666;
     margin-bottom: 5px;
 }
 
-/* Поля вводу — тільки лінія знизу */
 .booking-form input, 
 .booking-form textarea {
+    width: 100%;
+    box-sizing: border-box;
     border: none;
-    border-bottom: 1px solid #000;
-    border-radius: 0;
+    border-bottom: 1px solid #1a1a1a; 
     padding: 10px 0;
     background: transparent;
+    outline: none;
     font-family: inherit;
     font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s;
+    color: #1a1a1a !important;
+}
+
+.form-group textarea {
+    resize: none; /* Забороняємо ручну зміну розміру, щоб випадково не створювати скрол */
+    min-height: 80px;    
+    line-height: 1.5;
 }
 
 .booking-form input:focus, 
 .booking-form textarea:focus {
-    border-bottom-width: 2px; /* Потовщення лінії при кліку */
+    border-bottom-width: 2px;
 }
 
-/* Кнопка відправки форми */
+/* Оновлений стиль лічильника — тепер він ідеально сидітиме під textarea */
+.char-counter {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: #666666 !important;
+    margin-top: 6px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
 .submit-btn {
-    background: #000;
-    color: #fff;
-    border: 1px solid #000;
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
     padding: 18px;
     text-transform: uppercase;
     letter-spacing: 4px;
     font-size: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .submit-btn:hover {
     background: transparent;
-    color: #000;
+    color: #000000;
 }
 
 .submit-btn:disabled {
-    background: #ccc;
-    border-color: #ccc;
+    background: #cccccc;
+    border-color: #cccccc;
     cursor: not-allowed;
 }
 
-/* Повідомлення про статус */
 .status-message {
     margin-top: 20px;
     font-size: 14px;
@@ -151,14 +167,3 @@
 
 .success { color: #067647; }
 .error { color: #b42318; }
-.about-page,
-.contacts-page,
-.login-page {
-  padding-top: calc(120px + 2rem); /* Динамічний відступ: висота хедера + м'який запас */
-  min-height: calc(100vh - 120px); /* Контент розтягується на весь екран мінус хедер */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Центрує вміст по вертикалі */
-  align-items: center;     /* Центрує вміст по горизонталі */
-  box-sizing: border-box;
-}
