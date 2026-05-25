@@ -4,9 +4,10 @@ import { useRoute } from 'vue-router'
 import { getCollection } from '@/services/portfolioService'
 import CollectionHeader from '@/components/CollectionHeader.vue'
 import CollectionGallery from '@/components/CollectionGallery.vue'
-import { usePagination } from '@/composables/usePagination'
+
 const route = useRoute()
 const isLoading = ref(false)
+const isLoadingMore = ref(false)
 const collection = ref(null)
 const categoryId = computed(() => String(route.params.categoryId || ''))
 const collectionId = computed(() => String(route.params.collectionId || ''))
@@ -25,14 +26,18 @@ const photos = computed(() => {
     .filter((p) => p.url && String(p.url).trim() !== '')
 })
 
-const {
-  currentPage,
-  totalPages,
-  paginatedItems: paginatedPhotos,
-  nextPage,
-  prevPage,
-  goToPage
-} = usePagination(photos, 10)
+const visibleCount = ref(10)
+
+const displayedPhotos = computed(() => photos.value.slice(0, visibleCount.value))
+const hasMorePhotos = computed(() => visibleCount.value < photos.value.length)
+
+const loadMorePhotos = async () => {
+  if (isLoadingMore.value || !hasMorePhotos.value) return
+  isLoadingMore.value = true
+  await new Promise((resolve) => setTimeout(resolve, 120))
+  visibleCount.value = Math.min(visibleCount.value + 10, photos.value.length)
+  isLoadingMore.value = false
+}
 
 const load = async () => {
   if (!categoryId.value || !collectionId.value) {
@@ -43,6 +48,10 @@ const load = async () => {
   collection.value = await getCollection(categoryId.value, collectionId.value)
   isLoading.value = false
 }
+
+watch(photos, () => {
+  visibleCount.value = Math.min(10, photos.value.length)
+})
 
 onMounted(load)
 watch([categoryId, collectionId], load)
@@ -66,42 +75,29 @@ watch([categoryId, collectionId], load)
     <template v-else-if="collection">
       <CollectionHeader :collection="collection" />
       <CollectionGallery
-        :photos="paginatedPhotos"
+        :photos="displayedPhotos"
         :fallback-image="collection.image"
         :name="collection.name"
+        :total-photos="photos.length"
+        :photo-offset="0"
+        @load-more="loadMorePhotos"
       />
+
+      <div class="collection-meta">
+        <p>Показано {{ displayedPhotos.length }} з {{ photos.length }} фото</p>
+      </div>
 
       <div class="collection-controls">
         <button
-          v-if="currentPage < totalPages"
+          v-if="hasMorePhotos"
           class="load-more-btn"
-          @click="nextPage"
+          @click="loadMorePhotos"
+          :disabled="isLoadingMore"
         >
-          Завантажити ще 10 фото
-        </button>
-      </div>
-
-      <div v-if="totalPages > 1" class="pagination">
-        <button class="page-arrow" @click="prevPage" :disabled="currentPage === 1" aria-label="Попередня сторінка">
-          ←
-        </button>
-
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          :class="{ active: page === currentPage }"
-          @click="goToPage(page)"
-          type="button"
-        >
-          {{ page }}
-        </button>
-
-        <button class="page-arrow" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Наступна сторінка">
-          →
+          {{ isLoadingMore ? 'Loading...' : 'Завантажити ще 10 фото' }}
         </button>
       </div>
     </template>
-    
 
     <template v-else>
       <p>Collection not found.</p>

@@ -1,6 +1,8 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import BaseImage from '@/components/BaseImage.vue'
+
+const emit = defineEmits(['loadMore'])
 
 const props = defineProps({
   photos: {
@@ -14,10 +16,19 @@ const props = defineProps({
   name: {
     type: String,
     default: ''
+  },
+  photoOffset: {
+    type: Number,
+    default: 0
+  },
+  totalPhotos: {
+    type: Number,
+    default: 0
   }
 })
 
 const selectedPhotoIndex = ref(-1)
+const pendingNext = ref(false)
 
 const selectedPhoto = computed(() => {
   return selectedPhotoIndex.value >= 0 && selectedPhotoIndex.value < props.photos.length
@@ -25,8 +36,28 @@ const selectedPhoto = computed(() => {
     : null
 })
 
+const displayedPhotoIndex = computed(() => selectedPhotoIndex.value + 1 + props.photoOffset)
+const totalPhotoCount = computed(() => props.totalPhotos || props.photos.length)
+
+const isLastDisplayedPhoto = computed(() => selectedPhotoIndex.value === props.photos.length - 1)
+const hasMoreOutside = computed(() => props.photoOffset + props.photos.length < totalPhotoCount.value)
 const hasPrev = computed(() => selectedPhotoIndex.value > 0)
-const hasNext = computed(() => selectedPhotoIndex.value >= 0 && selectedPhotoIndex.value < props.photos.length - 1)
+const hasNext = computed(() => selectedPhotoIndex.value >= 0 && (selectedPhotoIndex.value < props.photos.length - 1 || hasMoreOutside.value))
+
+watch(
+  () => props.photos.length,
+  (newLen, oldLen) => {
+    if (pendingNext.value && newLen > oldLen) {
+      selectedPhotoIndex.value = oldLen
+      pendingNext.value = false
+      return
+    }
+
+    if (selectedPhotoIndex.value >= newLen) {
+      selectedPhotoIndex.value = Math.max(newLen - 1, 0)
+    }
+  }
+)
 
 const openPhoto = (index) => {
   if (props.photos[index]?.url) {
@@ -45,8 +76,16 @@ const prevPhoto = () => {
 }
 
 const nextPhoto = () => {
-  if (hasNext.value) {
+  if (!hasNext.value) return
+
+  if (selectedPhotoIndex.value < props.photos.length - 1) {
     selectedPhotoIndex.value += 1
+    return
+  }
+
+  if (isLastDisplayedPhoto.value && hasMoreOutside.value) {
+    pendingNext.value = true
+    emit('loadMore')
   }
 }
 
@@ -128,7 +167,7 @@ onUnmounted(() => {
         </button>
 
         <div class="photo-modal__meta">
-          {{ selectedPhotoIndex + 1 }} / {{ photos.length }}
+          {{ displayedPhotoIndex }} / {{ totalPhotoCount }}
         </div>
       </div>
     </div>
