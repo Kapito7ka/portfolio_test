@@ -7,7 +7,7 @@
   
   <main :class="['container', { 'container--home': isHome }]">
     <RouterView />
-    <footer class="footer-strip">
+    <footer :class="['footer-strip', { 'footer-strip--home': isHome }]">
       <div class="footer-container">
         <div class="footer-contacts">
           <a href="tel:+380970000000">+380 97 000 00 00</a>
@@ -53,7 +53,10 @@ html, body, #app {
 }
 
 .container--home {
-  padding-top: 96px;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 0;
 }
 
 .header {

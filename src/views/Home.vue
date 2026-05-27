@@ -64,32 +64,25 @@ onMounted(async () => {
 <style scoped>
 .home-page {
   width: 100vw;
-  min-width: 100vw;
-  margin: -96px 0 0 0;
+  max-width: none;
+  height: 100vh;
+  margin: 0;
   padding: 0;
   overflow: hidden;
   background: transparent;
 }
 
-.home-slider {
-  width: 100vw;
-  min-width: 100vw;
-  min-height: 100vh;
-  height: 100vh;
-}
-
+.home-slider,
 .home-slider .swiper-wrapper,
 .home-slider .swiper-slide {
   width: 100vw !important;
+  height: 100vh !important;
 }
 
 .hero-slide {
+  width: 100vw;
   min-width: 100vw;
-}
-
-.hero-slide {
-  width: 100%;
-  height: 100%;
+  height: 100vh;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -178,28 +171,13 @@ onMounted(async () => {
   padding: 80px 20px;
 }
 
-@media (max-width: 1024px) {
-  .home-slider {
-    height: 60vh;
-  }
-}
-
 @media (max-width: 768px) {
-  .home-slider {
-    height: 46vh;
-  }
-
   .hero-slide__title {
     font-size: 2rem;
   }
 }
 
 @media (max-width: 640px) {
-  .home-slider {
-    min-height: 260px;
-    height: 45vh;
-  }
-
   .hero-slide__title {
     font-size: 1.2rem;
   }

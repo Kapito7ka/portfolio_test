@@ -63,7 +63,6 @@ function instagramPostHref(url) {
   return `https://${u}`
 }
 </script>
-
 <template>
   <div class="portfolio-home">
     <section class="portfolio-hero">
@@ -155,7 +154,8 @@ function instagramPostHref(url) {
 
 <style scoped>
 .portfolio-home {
-  padding-bottom: 40px;
+  position: relative;
+  min-height: 100vh;
 }
 
 .full-bleed {

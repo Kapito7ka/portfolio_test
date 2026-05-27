@@ -1,0 +1,60 @@
+/* Overlay footer on Home only */
+.footer-strip--home {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 200;
+  width: 100%;
+  margin: 0;
+  padding: 18px 0;
+  box-sizing: border-box;
+  background: transparent;
+  border-top: none;
+}
+
+.footer-strip--home .footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.footer-strip--home .footer-contacts a,
+.footer-strip--home .footer-socials a {
+  text-decoration: none !important;
+  color: #ffffff !important;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.footer-strip--home .footer-contacts a:hover,
+.footer-strip--home .footer-socials a:hover {
+  color: #ff6b6b !important;
+}
+
+.footer-strip--home .dot {
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 15px;
+}
+
+@media (max-width: 640px) {
+  .footer-strip--home {
+    padding: 18px 12px;
+  }
+
+  .footer-strip--home .footer-container {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-strip--home .dot {
+    display: none;
+  }
+}
