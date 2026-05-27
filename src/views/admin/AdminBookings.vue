@@ -64,8 +64,73 @@ onMounted(fetchBookings)
 </template>
 
 <style scoped>
-.bookings-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-.bookings-table th, .bookings-table td { padding: 12px; border: 1px solid #eee; text-align: left; }
-.bookings-table th { background: #f9f9f9; }
-.btn-delete { color: white; background: #ff4d4d; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+.admin-bookings {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #ffffff;
+  /* Чорні рамки */
+  border: 1px solid #000000;
+}
+
+.bookings-table th, 
+.bookings-table td {
+  padding: 12px;
+  /* Чорні рамки для клітинок */
+  border: 1px solid #000000;
+  text-align: left;
+  color: #000000; /* Весь текст чорний */
+}
+
+.bookings-table th {
+  background: #f0f0f0; /* Світло-сірий фон заголовків для контрасту */
+  font-weight: bold;
+}
+
+/* Стиль для кнопки видалити */
+.btn-delete {
+  color: #ffffff;
+  background: #000000; /* Чорна кнопка */
+  border: 1px solid #000000;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 0; /* Прямі кути */
+  font-weight: bold;
+}
+
+.btn-delete:hover {
+  background: #333333;
+}
+
+/* Колір посилань телефону */
+.bookings-table a {
+  color: #000000;
+  text-decoration: underline;
+}
+
+.btn-delete {
+  color: #ffffff;
+  background-color: #d32f2f; /* Приглушений, професійний червоний */
+  border: none;             /* Прибираємо рамку для мінімалістичного вигляду */
+  padding: 8px 16px;        /* Додаємо більше простору всередині */
+  cursor: pointer;
+  border-radius: 4px;       /* Легке заокруглення робить кнопку сучаснішою */
+  font-weight: 500;         /* Менш жирний текст виглядає акуратніше */
+  transition: background-color 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: #b71c1c; /* Темніший відтінок при наведенні */
+}
 </style>
