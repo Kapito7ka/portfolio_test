@@ -1,0 +1,222 @@
+/* @/styles/AdminAbout.css */
+
+.admin-about-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.admin-about-container h1 {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #111111;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 12px;
+}
+
+.admin-card {
+  display: grid;
+  grid-template-columns: 1fr 260px; /* Фотографія акуратна, всього 260px в ширину */
+  column-gap: 50px;
+  row-gap: 24px;
+  background: transparent;
+  align-items: start;
+}
+
+.lang-selector {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.lang-btn {
+  padding: 5px 12px;
+  border: 1px solid #111111;
+  background: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: #999999;
+  transition: all 0.2s ease;
+}
+
+.lang-btn.active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group:nth-of-type(1),
+.input-group:nth-of-type(2) {
+  grid-column: 1;
+}
+
+.input-group:nth-of-type(3) {
+  grid-column: 2;
+  grid-row: 2 / 4;
+}
+
+.input-group label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #ff6b6b;
+}
+
+.input-field {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 12px 16px;
+  color: #1a1a1a;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+input.input-field {
+  font-family: 'Georgia', serif;
+  font-size: 22px;
+}
+
+textarea.input-field {
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 160px;
+  resize: none;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+}
+
+/* --- КОМПАКТНИЙ ІЗОЛЬОВАНИЙ БЛОК ФОТО --- */
+.file-upload-block {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 3 / 4; /* Портретні пропорції */
+  background: #f9f9f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5; /* Поверх картинки, але всередині свого контейнера */
+}
+
+.preview-box {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease;
+}
+
+.file-upload-block::after {
+  content: "Змінити фото";
+  position: absolute;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.file-upload-block:hover img {
+  filter: brightness(0.6);
+}
+
+.file-upload-block:hover::after {
+  opacity: 1;
+}
+
+.file-upload-block:not(:has(img))::before {
+  content: "Обрати фото";
+  font-size: 11px;
+  color: #999999;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+
+/* --- КНОПКА ЗБЕРЕЖЕННЯ --- */
+.save-btn {
+  grid-column: 1;
+  justify-self: start;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  padding: 14px 40px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  margin-top: 10px;
+  position: relative;
+  z-index: 10; /* Завжди доступна для кліку */
+}
+
+.save-btn:hover {
+  background: #333333;
+}
+
+@media (max-width: 850px) {
+  .admin-card {
+    grid-template-columns: 1fr;
+  }
+  
+  .lang-selector,
+  .input-group,
+  .file-upload-block,
+  .save-btn {
+    grid-column: 1;
+  }
+  
+  .input-group:nth-of-type(3) {
+    order: -1;
+    margin-bottom: 20px;
+  }
+}

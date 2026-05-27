@@ -1,5 +1,6 @@
 <script setup>
 import ContactList from '@/components/ContactList.vue'
+import '@/styles/AdminContacts.css'
 </script>
 
 <template>
@@ -12,7 +13,3 @@ import ContactList from '@/components/ContactList.vue'
     </div>    
   </section>
 </template>
-
-<style scoped>
-.block { margin-bottom: 40px; }
-</style>

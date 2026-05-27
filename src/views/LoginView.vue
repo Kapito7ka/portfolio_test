@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useRouter } from 'vue-router'
+import '@/styles/login.css'
 
 const router = useRouter()
 const loginError = ref('')
@@ -45,24 +46,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.error-msg { color: #d93025; margin-top: 15px; font-weight: 500; }
-.about-page,
-.contacts-page,
-.login-page {
-  padding-top: calc(120px + 2rem); /* Динамічний відступ: висота хедера + м'який запас */
-  min-height: calc(100vh - 120px); /* Контент розтягується на весь екран мінус хедер */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Центрує вміст по вертикалі */
-  align-items: center;     /* Центрує вміст по горизонталі */
-  box-sizing: border-box;
-}
-.login-container {
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-}
-</style>
