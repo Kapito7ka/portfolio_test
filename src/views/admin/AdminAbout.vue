@@ -2,9 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
-// Імпортуємо правильну функцію саме для цієї сторінки
-import { uploadAboutPhoto, deletePhoto } from '@/supabase'
-import '@/styles/AdminAbout.css'
+import { uploadPhoto, deletePhoto } from '@/supabase'
 
 const activeLang = ref('ua')
 
@@ -15,39 +13,15 @@ const form = ref({
 })
 const currentFileName = ref(null)
 
-// Функція для правильного отримання повного шляху файлу з URL (враховуючи папки)
-const extractStoragePath = (url) => {
-  if (!url) return null
-  try {
-    const decodedUrl = decodeURIComponent(url)
-    // Шукаємо місце, де закінчується назва бакета 'photos/'
-    const bucketMarker = '/Opacity/photos/' // Або просто '/photos/' залежно від URL
-    
-    if (decodedUrl.includes('/photos/')) {
-      const parts = decodedUrl.split('/photos/')
-      return parts[parts.length - 1].split('?')[0]
-    }
-    
-    const parts = decodedUrl.split('/')
-    return parts[parts.length - 1].split('?')[0]
-  } catch (e) {
-    console.error("Не вдалося розпарсити шлях файлу:", e)
-    return null
-  }
-}
-
 onMounted(async () => {
-  try {
-    const snap = await getDoc(doc(db, 'about_us', 'main'))
-    if (snap.exists()) {
-      form.value = snap.data()
-      if (form.value.image) {
-        currentFileName.value = extractStoragePath(form.value.image)
-        console.log("Поточний шлях до файлу в Supabase:", currentFileName.value)
-      }
+  const snap = await getDoc(doc(db, 'about_us', 'main'))
+  if (snap.exists()) {
+    form.value = snap.data()
+
+    if (form.value.image) {
+      const parts = form.value.image.split('/')
+      currentFileName.value = parts[parts.length - 1]
     }
-  } catch (error) {
-    console.error("Помилка завантаження з Firestore:", error)
   }
 })
 
@@ -55,42 +29,24 @@ const handleUpload = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
-  // 1. Спочатку видаляємо попереднє фото, якщо воно є
   if (currentFileName.value) {
-    try {
-      await deletePhoto(currentFileName.value)
-      console.log("Старе фото успішно видалено зі сховища:", currentFileName.value)
-    } catch (err) {
-      console.warn("Пропущено видалення старого фото:", err)
-    }
+    await deletePhoto(currentFileName.value)
   }
 
-  // 2. Завантажуємо нове за допомогою ізольованої функції
-  try {
-    const result = await uploadAboutPhoto(file)
-    console.log("Результат завантаження фото:", result)
+  const result = await uploadPhoto(file)
 
-    if (result && result.publicUrl) {
-      form.value.image = result.publicUrl
-      currentFileName.value = result.fileName
-      alert('Фото завантажено у сховище! Натисніть "Зберегти зміни", щоб оновити сайт.')
-    } else {
-      alert('Помилка: Не вдалося отримати дані завантаженого файлу.')
-    }
-  } catch (error) {
-    console.error("Критичний збій при handleUpload:", error)
-    alert('Помилка виконання скрипта завантаження.')
+  if (result) {
+    form.value.image = result.publicUrl
+    currentFileName.value = result.fileName
+    alert('Фото оновлено!')
+  } else {
+    alert('Помилка завантаження')
   }
 }
 
 const save = async () => {
-  try {
-    await setDoc(doc(db, 'about_us', 'main'), form.value)
-    alert('Дані успішно збережено в базі!')
-  } catch (error) {
-    console.error("Помилка збереження у Firestore:", error)
-    alert('Не вдалося зберегти зміни.')
-  }
+  await setDoc(doc(db, 'about_us', 'main'), form.value)
+  alert('Збережено')
 }
 </script>
 
@@ -140,10 +96,10 @@ const save = async () => {
       <div class="input-group">
         <label>Портретне фото</label>
         <div class="file-upload-block">
-          <input type="file" class="file-input" @change="handleUpload" accept="image/*" />
+          <input type="file" class="file-input" @change="handleUpload" />
           
           <div v-if="form.image" class="preview-box">
-            <img :src="form.image" alt="Прев'ю портрета" />
+            <img :src="form.image" alt="Прев'ю" />
           </div>
         </div>
       </div>
@@ -152,3 +108,141 @@ const save = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.admin-about-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #222;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  color: #111;
+  text-align: left;
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: block;
+}
+
+.lang-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.lang-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.lang-btn.active {
+  background: #1e293b;
+  color: #fff;
+  border-color: #1e293b;
+}
+
+.input-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  border-color: #64748b;
+}
+
+textarea.input-field {
+  min-height: 140px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.file-upload-block {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 5px;
+}
+
+.file-input {
+  font-size: 14px;
+}
+
+.preview-box {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.save-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+  margin-top: 10px;
+  width: auto;
+}
+
+.save-btn:hover {
+  background: #059669;
+}
+</style>

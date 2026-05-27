@@ -1,4 +1,3 @@
-/* ----- Глобальні базові стилі ----- */
 * {
   box-sizing: border-box;
 }
@@ -9,7 +8,6 @@ html, body {
   width: 100%;
   overflow-x: hidden;
   background-color: #ffffff;
-  font-family: 'Arial', sans-serif;
 }
 
 section {
@@ -18,13 +16,13 @@ section {
   padding: 60px 20px;
 }
 
-/* ----- Типографіка ----- */
 h1 {
   font-size: 48px;
   font-weight: 300;
   margin-bottom: 10px;
   letter-spacing: 3px;
   text-align: center;
+  font-family: 'Arial', sans-serif;
 }
 
 h3 {
@@ -39,27 +37,20 @@ p {
   margin-bottom: 20px;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 8px;
-  color: #333;
-}
-
-/* ----- Контейнери та Обгортки хедера ----- */
+/* Container */
 .container {
   padding: 0;
 }
 
+/* Navigation Header */
 .header {
+  .header {
   width: 100%;
-  padding: 15px 20px; 
+  padding: 15px 20px; /* Зменшили верхній і нижній відступи з 30px до 15px */
   position: relative;
   z-index: 100;
   box-sizing: border-box;
+}
 }
 
 .header-inner {
@@ -85,7 +76,34 @@ li {
   margin-bottom: 25px;
 }
 
-/* ----- Загальна сітка (Grid) та Картки ----- */
+/* Navigation */
+.nav {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  background: transparent;
+  padding: 0;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav a:hover {
+  color: #ff6b6b;
+}
+
+.nav a.router-link-active {
+  color: #ff6b6b;
+}
+
+/* Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -93,6 +111,21 @@ li {
   padding: 0 20px;
 }
 
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Card */
 .card {
   border: none;
   padding: 0;
@@ -108,13 +141,13 @@ li {
   display: block;
 }
 
-/* ----- Базові зображення ----- */
+/* Base Image */
 .base-image-container {
   margin: 12px 0;
 }
 
 .base-image {
-  width: 100%;           
+  width: 100%;             
   max-width: 450px;        
   height: 500px;           
   object-fit: cover;       
@@ -123,6 +156,18 @@ li {
   margin-left: auto;
 }
 
+/* Lists */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Category Label */
 .category-label {
   font-size: 12px;
   color: #999;
@@ -130,7 +175,7 @@ li {
   letter-spacing: 0.5px;
 }
 
-/* ----- Посилання "Назад" ----- */
+/* ----- Back link (CategoryCollections, Collection) ----- */
 .back-link {
   display: inline-block;
   margin-bottom: 30px;
@@ -140,12 +185,11 @@ li {
   font-size: 14px;
   letter-spacing: 0.5px;
 }
-
 .back-link:hover {
   color: #ff6b6b;
 }
 
-/* ----- Головна сторінка Портфоліо ----- */
+/* ----- Portfolio (головна) ----- */
 .portfolio-welcome {
   font-family: 'Georgia', serif;
   font-size: 1.1rem;
@@ -161,7 +205,7 @@ li {
   padding: 0;
 }
 
-/* ----- Обгортка карток колекцій ----- */
+/* ----- CollectionCard Container ----- */
 .collection-card-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -170,7 +214,21 @@ li {
   margin: 30px 0 0 0;
 }
 
-/* ----- Картка колекції ----- */
+@media (max-width: 1024px) {
+  .collection-card-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .collection-card-wrapper {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ----- CollectionCard ----- */
 .collection-card {
   display: flex;
   flex-direction: column;
@@ -218,6 +276,7 @@ li {
 
 .collection-card__title {
   margin: 0;
+  font-family: 'Arial', sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -246,7 +305,9 @@ li {
   color: #ff6b6b;
 }
 
-/* ----- Шапка колекцій ----- */
+/* ----- CategoryCollections ----- */
+
+/* ----- Collection Header ----- */
 header {
   margin-bottom: 40px;
 }
@@ -269,7 +330,7 @@ header .category-label {
   font-style: italic;
 }
 
-/* ----- Галерея колекцій (Масонрі / Шахматка) ----- */
+/* ----- CollectionGallery ----- */
 .collection-gallery {
   margin-top: 40px;
 }
@@ -282,6 +343,78 @@ header .category-label {
   margin-top: 0;
 }
 
+/* Масонри розміри для шахматного розташування */
+.collection-gallery .base-image:nth-child(1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.collection-gallery .base-image:nth-child(2) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(3) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(4) {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(5) {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.collection-gallery .base-image:nth-child(6) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(7) {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(8) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(9) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+/* Цикл паттерну для більше фото */
+.collection-gallery .base-image:nth-child(10n+1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.collection-gallery .base-image:nth-child(10n+2),
+.collection-gallery .base-image:nth-child(10n+3),
+.collection-gallery .base-image:nth-child(10n+6),
+.collection-gallery .base-image:nth-child(10n+8),
+.collection-gallery .base-image:nth-child(10n+9) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(10n+4),
+.collection-gallery .base-image:nth-child(10n+7) {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.collection-gallery .base-image:nth-child(10n+5) {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
 .collection-gallery .base-image {
   width: 100%;
   height: 100%;
@@ -289,29 +422,50 @@ header .category-label {
   display: block;
 }
 
-/* Масонрі правила */
-.collection-gallery .base-image:nth-child(1) { grid-column: span 2; grid-row: span 2; }
-.collection-gallery .base-image:nth-child(2) { grid-column: span 1; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(3) { grid-column: span 1; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(4) { grid-column: span 2; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(5) { grid-column: span 1; grid-row: span 2; }
-.collection-gallery .base-image:nth-child(6) { grid-column: span 1; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(7) { grid-column: span 2; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(8) { grid-column: span 1; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(9) { grid-column: span 1; grid-row: span 1; }
+@media (max-width: 1024px) {
+  .collection-gallery .grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 220px;
+    gap: 12px;
+  }
 
-/* Повторення паттерну для великої кількості фото */
-.collection-gallery .base-image:nth-child(10n+1) { grid-column: span 2; grid-row: span 2; }
-.collection-gallery .base-image:nth-child(10n+2),
-.collection-gallery .base-image:nth-child(10n+3),
-.collection-gallery .base-image:nth-child(10n+6),
-.collection-gallery .base-image:nth-child(10n+8),
-.collection-gallery .base-image:nth-child(10n+9) { grid-column: span 1; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(10n+4),
-.collection-gallery .base-image:nth-child(10n+7) { grid-column: span 2; grid-row: span 1; }
-.collection-gallery .base-image:nth-child(10n+5) { grid-column: span 1; grid-row: span 2; }
+  .collection-gallery .base-image:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
 
-/* ----- Пагінація ----- */
+  .collection-gallery .base-image:nth-child(4),
+  .collection-gallery .base-image:nth-child(7) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .collection-gallery .base-image:nth-child(5) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .collection-gallery .grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 180px;
+    gap: 12px;
+  }
+
+  .collection-gallery .base-image:nth-child(1),
+  .collection-gallery .base-image:nth-child(4),
+  .collection-gallery .base-image:nth-child(7) {
+    grid-column: span 1;
+  }
+
+  .collection-gallery .base-image:nth-child(5) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+}
+
+/* ----- Pagination ----- */
 .pagination {
   display: flex;
   justify-content: center;
@@ -349,7 +503,8 @@ header .category-label {
   cursor: not-allowed;
 }
 
-/* ----- Сторінка "Про мене" (About) ----- */
+
+/* ----- About Page ----- */
 .about-section {
   max-width: 800px;
   margin: 0 auto;
@@ -363,7 +518,7 @@ header .category-label {
   letter-spacing: 0.5px;
 }
 
-.about-section img {
+.about-section image {
   max-width: 100%;
   border-radius: 0;
   margin: 30px 0;
@@ -384,7 +539,6 @@ header .category-label {
   max-width: 1200px;
   margin: 40px auto;
 }
-
 .about-text-content {
   flex: 1;               
   text-align: left;
@@ -402,14 +556,13 @@ header .category-label {
   margin-top: 0;
   font-weight: 400;
 }
-
 .about-image-wrapper {
   flex: 1;               
   display: flex;
   justify-content: flex-end;
 }
 
-/* ----- Адмін-Панель Портфоліо ----- */
+/* ----- AdminPortfolio ----- */
 .admin-portfolio .row {
   display: flex;
   gap: 16px;
@@ -417,22 +570,41 @@ header .category-label {
   align-items: center;
   margin: 12px 0;
 }
-.admin-portfolio .block { margin-top: 12px; }
-.admin-portfolio .block h2 { margin: 0 0 8px; }
-.admin-portfolio .block p { margin: 0 0 12px; }
+.admin-portfolio .block {
+  margin-top: 12px;
+}
+.admin-portfolio .block h2 {
+  margin: 0 0 8px;
+}
+.admin-portfolio .block p {
+  margin: 0 0 12px;
+}
 .admin-portfolio .grid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   margin-top: 16px;
 }
-.admin-portfolio .photoCard { display: grid; gap: 8px; }
-.admin-portfolio .photoActions { display: flex; justify-content: flex-end; }
-.admin-portfolio .error { color: #b42318; margin-top: 8px; }
-.admin-portfolio .success { color: #067647; margin-top: 8px; }
-
-/* Прогрес бар */
-.admin-portfolio .progress-container { margin: 10px 0; max-width: 300px; }
+.admin-portfolio .photoCard {
+  display: grid;
+  gap: 8px;
+}
+.admin-portfolio .photoActions {
+  display: flex;
+  justify-content: flex-end;
+}
+.admin-portfolio .error {
+  color: #b42318;
+  margin-top: 8px;
+}
+.admin-portfolio .success {
+  color: #067647;
+  margin-top: 8px;
+}
+.admin-portfolio .progress-container {
+  margin: 10px 0;
+  max-width: 300px;
+}
 .admin-portfolio .progress-bar {
   width: 100%;
   height: 10px;
@@ -445,10 +617,16 @@ header .category-label {
   background-color: #4caf50;
   transition: width 0.3s ease;
 }
-.admin-portfolio .progress-text { font-size: 12px; color: #666; margin-top: 4px; }
-.admin-portfolio .admin-portfolio-else { margin-top: 12px; }
+.admin-portfolio .progress-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+.admin-portfolio .admin-portfolio-else {
+  margin-top: 12px;
+}
 
-/* ----- Аккордеон ----- */
+/* ----- Accordion ----- */
 .accordion {
   margin-bottom: 20px;
   border: 1px solid #e0e0e0;
@@ -470,10 +648,25 @@ header .category-label {
   transition: background-color 0.2s ease;
 }
 
-.accordion-header:hover { background-color: #f0f0f0; }
-.accordion-header h2 { margin: 0; font-size: 16px; }
-.accordion-icon { display: inline-block; transition: transform 0.3s ease; font-size: 12px; color: #666; }
-.accordion-icon.open { transform: rotate(-180deg); }
+.accordion-header:hover {
+  background-color: #f0f0f0;
+}
+
+.accordion-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.accordion-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+  color: #666;
+}
+
+.accordion-icon.open {
+  transform: rotate(-180deg);
+}
 
 .accordion-content {
   background: #ffffff;
@@ -483,11 +676,17 @@ header .category-label {
 }
 
 @keyframes slideDown {
-  from { opacity: 0; max-height: 0; }
-  to { opacity: 1; max-height: 500px; }
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
 }
 
-/* ----- Категорії та Колекції в Адмінці ----- */
+/* ----- AdminPortfolio Updated ----- */
 .category-section {
   display: flex;
   justify-content: space-between;
@@ -498,13 +697,44 @@ header .category-label {
   border-radius: 4px;
 }
 
-.category-info h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
-.category-info p { margin: 0; font-size: 14px; color: #666; }
-.category-actions { display: flex; gap: 12px; margin-top: 16px; }
-.collections-section { margin: 24px 0; }
-.collections-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.collections-header h2 { margin: 0; }
-.collections-list { display: flex; flex-direction: column; gap: 12px; }
+.category-info h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.category-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.category-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.collections-section {
+  margin: 24px 0;
+}
+
+.collections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.collections-header h2 {
+  margin: 0;
+}
+
+.collections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 .collection-item {
   display: flex;
@@ -518,15 +748,41 @@ header .category-label {
   transition: background 0.15s ease;
 }
 
-.collection-item:hover { background: #d2e9ff; }
-.collection-info { flex: 1; }
-.collection-name { margin: 0 0 4px; font-weight: 600; color: #333; }
-.collection-location { margin: 0; font-size: 13px; color: #666; }
-.collection-actions { display: flex; gap: 12px; }
-.collection-item.selected { border-left-color: #2e7d32; background: rgba(46, 125, 50, 0.12); }
-.file-input-label { cursor: pointer; }
+.collection-item:hover {
+  background: #d2e9ff;
+}
 
-/* ----- Слайдер Swiper ----- */
+.collection-info {
+  flex: 1;
+}
+
+.collection-name {
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: #333;
+}
+
+.collection-location {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.collection-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.collection-item.selected {
+  border-left-color: #2e7d32;
+  background: rgba(46, 125, 50, 0.12);
+}
+
+.file-input-label {
+  cursor: pointer;
+}
+
+/* ----- Swiper Customization ----- */
 .swiper-button-next,
 .swiper-button-prev {
   color: #fff;
@@ -538,12 +794,25 @@ header .category-label {
 }
 
 .swiper-button-next:hover,
-.swiper-button-prev:hover { background: rgba(255, 255, 255, 0.4); }
-.swiper-button-next::after, .swiper-button-prev::after { font-size: 18px; }
-.swiper-pagination-bullet { background: rgba(255, 255, 255, 0.5); opacity: 1; }
-.swiper-pagination-bullet-active { background: #fff; }
+.swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
 
-/* ----- Базовий компонент кнопки ----- */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px;
+}
+
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #fff;
+}
+
+/* ----- Base Button Component ----- */
 button[class*="base-button"],
 .base-button {
   padding: 8px 16px;
@@ -563,7 +832,136 @@ button[class*="base-button"]:hover,
   color: #ff6b6b;
 }
 
-/* ----- Футер сайту ----- */
+/* ----- Responsive Design ----- */
+@media (max-width: 1024px) {
+  .header {
+    padding: 25px 20px;
+    margin-bottom: 30px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .nav {
+    gap: 30px;
+  }
+
+  .grid {
+    gap: 30px;
+  }
+
+  section {
+    padding: 40px 20px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 20px 15px;
+    margin-bottom: 20px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .logo-subtitle {
+    font-size: 9px;
+    margin-top: -15px;
+    margin-bottom: 15px;
+  }
+
+  .nav {
+    gap: 20px;
+    font-size: 13px;
+  }
+
+  .grid {
+    gap: 20px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .portfolio-welcome {
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+
+  section {
+    padding: 30px 15px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 15px 12px;
+    margin-bottom: 15px;
+  }
+
+  .logo {
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  .logo-subtitle {
+    font-size: 8px;
+    margin-top: -12px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .nav {
+    gap: 15px;
+    font-size: 12px;
+  }
+
+  .grid {
+    gap: 16px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .portfolio-welcome {
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+
+  .collection-card__title {
+    font-size: 12px;
+  }
+
+  .collection-card__location {
+    font-size: 11px;
+  }
+
+  section {
+    padding: 20px 12px;
+  }
+
+  .contacts-page {
+    margin: 40px auto;
+  }
+}
+/* APP footer*/
 .footer-strip {
   border-top: 1px solid #e5e5e5;
   padding: 30px 0;
@@ -597,74 +995,10 @@ button[class*="base-button"]:hover,
   margin: 0 10px;
 }
 
-/* ----- Адаптивний дизайн (Media Queries) ----- */
-@media (max-width: 1024px) {
-  .header { padding: 25px 20px; margin-bottom: 30px; }
-  .logo { font-size: 20px; }
-  .grid { gap: 30px; }
-  .grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
-  .collection-card-wrapper { grid-template-columns: repeat(2, 1fr); gap: 30px; }
-  section { padding: 40px 20px; }
-  .category-grid { grid-template-columns: repeat(2, 1fr); }
-  
-  .collection-gallery .grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 220px;
-    gap: 12px;
-  }
-  .collection-gallery .base-image:nth-child(1) { grid-column: span 2; grid-row: span 1; }
-  .collection-gallery .base-image:nth-child(4),
-  .collection-gallery .base-image:nth-child(7),
-  .collection-gallery .base-image:nth-child(5) { grid-column: span 1; grid-row: span 1; }
-}
-
-@media (max-width: 768px) {
-  .header { padding: 20px 15px; margin-bottom: 20px; }
-  .logo { font-size: 18px; }
-  .logo-subtitle { font-size: 9px; margin-top: -15px; margin-bottom: 15px; }
-  .grid { gap: 20px; }
-  .category-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-  .collection-card-wrapper { grid-template-columns: 1fr; gap: 24px; }
-  h1 { font-size: 28px; }
-  .portfolio-welcome { font-size: 1rem; margin-bottom: 40px; }
-  section { padding: 30px 15px; }
-
-  .collection-gallery .grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 180px;
-    gap: 12px;
-  }
-  .collection-gallery .base-image:nth-child(1),
-  .collection-gallery .base-image:nth-child(4),
-  .collection-gallery .base-image:nth-child(7),
-  .collection-gallery .base-image:nth-child(5) { grid-column: span 1; grid-row: span 1; }
-}
-
 @media (max-width: 640px) {
-  .header { padding: 15px 12px; margin-bottom: 15px; }
-  .logo { font-size: 16px; letter-spacing: 1px; }
-  .logo-subtitle { font-size: 8px; margin-top: -12px; margin-bottom: 12px; letter-spacing: 1px; }
-  .grid { grid-template-columns: 1fr; gap: 24px; }
-  .grid { gap: 16px; }
-  .category-grid { grid-template-columns: 1fr; gap: 20px; }
-  h1 { font-size: 20px; }
-  .portfolio-welcome { font-size: 0.95rem; margin-bottom: 30px; }
-  .collection-card__title { font-size: 12px; }
-  .collection-card__location { font-size: 11px; }
-  section { padding: 20px 12px; }
-  .contacts-page { margin: 40px auto; }
-  .footer-container { flex-direction: column; gap: 15px; align-items: center; }
-}
-
-.slider-skeleton {
-  width: 100vw;
-  height: 100vh; /* або твій height з портфоліо */
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  .footer-container {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
 }

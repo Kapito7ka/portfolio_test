@@ -125,30 +125,6 @@ export async function uploadCollectionCover(file, categoryId, collectionId) {
     fileName: fileName
   }
 }
-// --- Функція завантаження фото для сторінки "Про нас" ---
-export async function uploadAboutPhoto(file) {
-  if (!file) return null
-
-  const safeName = generateSafeFileName(file.name)
-  // Зберігаємо в окрему папку для контенту самого сайту
-  const fileName = `_site/about/${safeName}`
-
-  const { error: uploadError } = await supabase.storage
-    .from('photos')
-    .upload(fileName, file)
-
-  if (uploadError) {
-    console.error('Помилка завантаження фото Про нас:', uploadError.message)
-    return null
-  }
-
-  const { data } = supabase.storage.from('photos').getPublicUrl(fileName)
-
-  return {
-    publicUrl: data.publicUrl,
-    fileName: fileName
-  }
-}
 
 // --- Функція видалення фото ---
 export async function deletePhoto(fileName) {
