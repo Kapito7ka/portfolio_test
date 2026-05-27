@@ -4,9 +4,8 @@ import { RouterLink } from 'vue-router'
 import { supabase } from '@/supabase'
 import { getCategories, getInstagramSpotlights } from '@/services/portfolioService'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Autoplay, Pagination } from 'swiper/modules'
+import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
-import 'swiper/css/pagination'
 
 const categories = ref([])
 const slides = ref([])
@@ -65,12 +64,11 @@ function instagramPostHref(url) {
 </script>
 <template>
   <div class="portfolio-home">
-    <section class="portfolio-hero">
+    <section class="portfolio-hero full-bleed">
       <swiper
         v-if="portfolioSlides.length > 0"
-        :modules="[Autoplay, Pagination]"
+        :modules="[Autoplay]"
         :autoplay="{ delay: 5000 }"
-        pagination
         class="portfolio-slider"
       >
         <swiper-slide v-for="slide in portfolioSlides" :key="slide.id">
@@ -152,6 +150,8 @@ function instagramPostHref(url) {
   </div>
 </template>
 
+<style scoped src="@/styles/portfolio-slider.css"></style>
+
 <style scoped>
 .portfolio-home {
   position: relative;
@@ -162,73 +162,6 @@ function instagramPostHref(url) {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-}
-
-.portfolio-hero {
-  margin: 0 auto 0;
-  max-width: 1280px;
-  padding: 0 20px;
-}
-
-.portfolio-slider {
-  width: 100%;
-  height: 80vh;
-  min-height: 520px;
-  margin: 0 auto;
-}
-
-.hero-slide {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.hero-slide::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.28);
-}
-
-.hero-slide__inner {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  padding: 0 24px;
-}
-
-.hero-slide__title {
-  margin: 0;
-  color: #fff;
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.5rem, 4vw, 3.25rem);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
-}
-
-.hero-slide__kicker {
-  margin: 18px 0 0;
-  color: rgba(255, 255, 255, 0.92);
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-}
-
-.portfolio-hero-empty {
-  text-align: center;
-  color: #666;
-  padding: 80px 20px;
-  margin: 0;
 }
 
 .portfolio-intro {
@@ -380,17 +313,7 @@ function instagramPostHref(url) {
   opacity: 0.35;
 }
 
-@media (max-width: 1024px) {
-  .portfolio-slider {
-    height: 55vh;
-  }
-}
-
 @media (max-width: 768px) {
-  .portfolio-slider {
-    height: 45vh;
-  }
-
   .portfolio-intro {
     padding: 40px 20px 36px;
     font-size: 0.95rem;
@@ -413,10 +336,4 @@ function instagramPostHref(url) {
   }
 }
 
-@media (max-width: 640px) {
-  .portfolio-slider {
-    height: 40vh;
-    min-height: 260px;
-  }
-}
 </style>

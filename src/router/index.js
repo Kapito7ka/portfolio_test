@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from '../views/Home.vue'
 import Portfolio from '../views/Portfolio.vue'
+import CategoryCollections from '../views/CategoryCollections.vue'
 import About from '../views/About.vue'
 import Contacts from '../views/Contacts.vue'
 import AdminAbout from '../views/admin/AdminAbout.vue'
@@ -17,7 +18,7 @@ const router = createRouter({
     { path: '/', name: 'Home', component: Home },
     { path: '/portfolio', name: 'Portfolio', component: Portfolio },
     { path: '/slides', redirect: '/' },
-    { path: '/portfolio/:categoryId', name: 'CategoryCollections', component: () => import('../views/CategoryCollections.vue') },
+    { path: '/portfolio/:categoryId', name: 'CategoryCollections', component: CategoryCollections },
     { path: '/collections/:categoryId/:collectionId', name: 'Collection', component: () => import('../views/Collection.vue') },
     { path: '/about', name: 'About', component: About },
     { path: '/contacts', name: 'Contacts', component: Contacts },

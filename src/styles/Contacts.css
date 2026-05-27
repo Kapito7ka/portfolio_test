@@ -2,9 +2,8 @@
 
 .contacts-page {
     max-width: 800px;
-    margin: 0 auto;
-    /* Зменшили відступ знизу, щоб через подвійний хедер адмінки сторінка не випадала в скрол */
-    padding: 140px 20px 30px 20px; 
+    margin: 20px auto 0;
+    padding: 18px 20px 30px 20px;
     text-align: center;
     font-family: 'Georgia', serif;
     box-sizing: border-box;

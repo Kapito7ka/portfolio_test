@@ -26,6 +26,7 @@
 import { computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import NavBar from '@/components/NavBarAdmin.vue'
+import '@/styles/header.css'
 
 const route = useRoute()
 const isHome = computed(() => route.name === 'Home')
@@ -35,8 +36,8 @@ const isHome = computed(() => route.name === 'Home')
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #333333;
   overflow-x: hidden;
 }
 
@@ -59,38 +60,4 @@ html, body, #app {
   padding: 0;
 }
 
-.header {
-  position: static;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-
-.header--home {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: transparent;
-}
-
-.header .nav-link,
-.header .nav-link.router-link-active {
-  color: #222;
-}
-
-.header--home {
-  background: transparent;
-}
-
-.header--home .nav-link,
-.header--home .nav-link.router-link-active {
-  color: #fff;
-}
-
-.header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 18px 20px 14px;
-}
 </style>

@@ -83,10 +83,6 @@ watch([categoryId, collectionId], load)
         @load-more="loadMorePhotos"
       />
 
-      <div class="collection-meta">
-        <p>Показано {{ displayedPhotos.length }} з {{ photos.length }} фото</p>
-      </div>
-
       <div class="collection-controls">
         <button
           v-if="hasMorePhotos"
@@ -96,6 +92,10 @@ watch([categoryId, collectionId], load)
         >
           {{ isLoadingMore ? 'Loading...' : 'Завантажити ще 10 фото' }}
         </button>
+      </div>
+
+      <div class="collection-meta">
+        <p>Показано {{ displayedPhotos.length }} з {{ photos.length }} фото</p>
       </div>
     </template>
 
@@ -180,5 +180,12 @@ watch([categoryId, collectionId], load)
 .load-more-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.collection-meta {
+  text-align: center;
+  margin-top: 12px;
+  color: #333;
+  font-size: 14px;
 }
 </style>

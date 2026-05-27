@@ -1,0 +1,30 @@
+.header {
+  position: static;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.header--home {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+}
+
+.header .nav-link,
+.header .nav-link.router-link-active {
+  color: #222;
+}
+
+.header--home .nav-link,
+.header--home .nav-link.router-link-active {
+  color: #bdbdbd;
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 20px 14px;
+}
