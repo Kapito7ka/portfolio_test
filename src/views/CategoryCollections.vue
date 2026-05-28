@@ -4,9 +4,7 @@ import { useRoute } from 'vue-router'
 import { getCategory } from '@/services/portfolioService'
 import CollectionCard from '@/components/CollectionCard.vue'
 import { supabase } from '@/supabase'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Autoplay } from 'swiper/modules'
-import 'swiper/css'
+import PortfolioSlider from '@/components/PortfolioSlider.vue'
 
 const route = useRoute()
 const isLoading = ref(false)
@@ -71,26 +69,8 @@ watch(categoryId, load)
 
 <template>
   <div class="category-collections-page">
-    <section class="portfolio-hero">
-      <swiper
-        v-if="portfolioSlides.length > 0"
-        :modules="[Autoplay]"
-        :autoplay="{ delay: 5000 }"
-        class="portfolio-slider"
-      >
-        <swiper-slide v-for="slide in portfolioSlides" :key="slide.id">
-          <div
-            class="hero-slide"
-            :style="{ backgroundImage: slide.image_url ? `url(${slide.image_url})` : undefined }"
-          >
-            <div class="hero-slide__inner">
-              <h2 v-if="slide.title" class="hero-slide__title">{{ slide.title }}</h2>
-              <p class="hero-slide__kicker">Портфоліо</p>
-            </div>
-          </div>
-        </swiper-slide>
-      </swiper>
-      <p v-else class="portfolio-hero-empty">Слайди поки не додані.</p>
+    <section class="portfolio-hero full-bleed">
+      <PortfolioSlider :slides="portfolioSlides" kicker="Портфоліо" />
     </section>
 
     <div class="category-content-block">
@@ -114,8 +94,6 @@ watch(categoryId, load)
   </div>
 </template>
 
-<style scoped src="@/styles/category-slider.css"></style>
-
 <style scoped>
 .category-collections-page {
   width: 100%;
@@ -124,8 +102,8 @@ watch(categoryId, load)
 }
 
 .category-content-block {
-  margin-bottom: 50px;
-  padding: 25px 80px;
+  margin-bottom: 20px;
+  padding: 15px 80px;
 }
 
 .back-link-wrap {

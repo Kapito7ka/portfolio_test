@@ -495,7 +495,7 @@ const handleUpload = async (event, collectionId = uploadTargetCollectionId.value
       successText.value = `Успішно завантажено ${added.length} фото`
     }
 
-    await load()
+    await loadSelectedCollection()
 
   } catch (e) {
     errorText.value = e?.message || 'Помилка завантаження/збереження'
@@ -524,7 +524,7 @@ const removePhoto = async (photo) => {
       await deletePhoto(photo.fileName)
     }
 
-    await load()
+    await loadSelectedCollection()
   } catch (e) {
     errorText.value = e?.message || 'Помилка видалення'
   } finally {
