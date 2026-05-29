@@ -29,6 +29,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/supabase'
+import '@/styles/AdminSlides.css'
 
 const slides = ref([])
 const selectedPage = ref('home')
@@ -86,16 +87,3 @@ const removeSlide = async (slide) => {
 onMounted(fetchSlides)
 </script>
 
-<style scoped>
-.admin-panel { max-width: 900px; margin: auto; padding: 20px; }
-.tabs { margin-bottom: 20px; display: flex; gap: 10px; }
-.tabs button { padding: 8px 16px; cursor: pointer; border: 1px solid #ddd; background: white; border-radius: 4px; }
-.tabs button.active { background: #000; color: #fff; }
-.gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-.card { border: 1px solid #eee; padding: 10px; border-radius: 8px; }
-.card img { width: 100%; height: 150px; object-fit: cover; margin-bottom: 8px; border-radius: 4px; }
-.actions { display: flex; gap: 5px; }
-.actions button { flex: 1; padding: 5px; cursor: pointer; }
-.delete-btn { background: white; color: #ff4d4d; border: 1px solid #ff4d4d; border-radius: 4px; }
-.delete-btn:hover { background: #ff4d4d; color: white; }
-</style>

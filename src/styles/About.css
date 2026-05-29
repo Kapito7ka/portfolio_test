@@ -1,35 +1,116 @@
-.language-bar {
-  position: absolute;
-  top: 20px;
-  right: 40px; 
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 10;
+.about-page-clean {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: 'Georgia', serif;
+  background-color: #ffffff; 
+  color: #000000;
 }
 
-.language-bar button {
+.lang-switcher {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 30px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.lang-switcher button {
   background: none;
   border: none;
-  font-size: 12px;
-  letter-spacing: 1px;
   cursor: pointer;
-  color: #999;
-  transition: color 0.3s;
+  color: #aaa;
+  font-weight: bold;
+  padding: 2px 6px;
+}
+
+.lang-switcher button.active {
+  color: #000;
+}
+
+.slash {
+  color: #ccc;
+}
+
+.about-grid {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 40px;
 }
 
-.language-bar button.active {
+.about-info {
+  flex: 1;
+  max-width: 500px;
+}
+
+.intro-tag {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #666;
+  margin: 0 0 10px 0;
+}
+
+.profile-title {
+  font-size: 36px;
+  font-weight: 400;
   color: #1a1a1a;
-  font-weight: 600;
+  margin: 0 0 20px 0;
 }
 
-.flag-icon {
-  font-size: 16px;
+.profile-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0 0 30px 0;
+  white-space: pre-line;
 }
 
-.divider {
-  color: #e5e5e5;
+.btn-contact {
+  display: inline-block;
+  padding: 12px 28px;
+  border: 1px solid #000;
+  background: transparent;
+  color: #000;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.btn-contact:hover {
+  background: #000;
+  color: #fff;
+}
+
+.about-photo-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 500px;
+}
+
+.img-responsive {
+  width: 100%;
+  height: auto;
+  max-height: 400px; 
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    flex-direction: column-reverse;
+    gap: 30px;
+  }
+  .about-info {
+    text-align: center;
+    max-width: 100%;
+  }
+  .profile-title {
+    font-size: 28px;
+  }
 }
