@@ -118,57 +118,6 @@ p {
   }
 }
 
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-}
-
-/* Global dark text fallback */
-body {
-  color: #333333;
-}
-
-body * {
-  color: #333333 !important;
-}
-
-.header .nav-link,
-.header .nav-link.router-link-active {
-  color: #222222 !important;
-}
-
-.header--home .nav-link,
-.header--home .nav-link.router-link-active {
-  color: #bdbdbd !important;
-}
-
-.footer-strip--home .footer-contacts a,
-.footer-strip--home .footer-socials a {
-  color: #ffffff !important;
-}
-
-.footer-strip--home .dot {
-  color: rgba(255,255,255,0.55) !important;
-}
-
-/* Card */
-.card {
-  border: none;
-  padding: 0;
-  transition: opacity 0.3s ease;
-}
-
-.card:hover {
-  opacity: 0.8;
-}
-
-.card img {
-  width: 100%;
-  display: block;
-}
-
 /* Base Image */
 .base-image-container {
   margin: 12px 0;
@@ -310,7 +259,7 @@ li {
   letter-spacing: 0.5px;
   color: #1a1a1a;
   transition: color 0.3s ease;
-  text-align: left;
+  text-align: center;
 }
 
 .collection-card__location {
@@ -318,7 +267,7 @@ li {
   font-size: 12px;
   color: #999;
   letter-spacing: 0.3px;
-  text-align: left;
+  text-align: center;
 }
 
 .collection-card__arrow {
@@ -326,36 +275,11 @@ li {
   font-size: 18px;
   color: #1a1a1a;
   transition: color 0.3s ease;
-  text-align: left;
+  text-align: center;
 }
 
 .collection-card:hover .collection-card__arrow {
   color: #ff6b6b;
-}
-
-/* ----- CategoryCollections ----- */
-
-/* ----- Collection Header ----- */
-header {
-  margin-bottom: 40px;
-}
-
-header h1 {
-  margin-bottom: 12px;
-  text-align: center;
-}
-
-header p {
-  text-align: center;
-  font-size: 13px;
-  color: #999;
-  letter-spacing: 0.5px;
-  margin: 8px 0;
-}
-
-header .category-label {
-  font-size: 11px;
-  font-style: italic;
 }
 
 /* ----- CollectionGallery ----- */

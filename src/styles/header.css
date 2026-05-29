@@ -1,4 +1,33 @@
 .header {
+  width: 100%;
+  padding: 15px 20px;
+  position: relative;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+header h1 {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+header p {
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  letter-spacing: 0.5px;
+  margin: 8px 0;
+}
+
+header .category-label {
+  font-size: 11px;
+  font-style: italic;
+}
+.header {
   position: static;
   background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -26,5 +55,5 @@
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 18px 20px 14px;
+  padding: 10px 20px 10px;
 }
