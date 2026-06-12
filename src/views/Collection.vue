@@ -1,14 +1,14 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { getCollection } from '@/services/portfolioService'
-import CollectionHeader from '@/components/CollectionHeader.vue'
+import { getCategory, getCollection } from '@/services/portfolioService'
 import CollectionGallery from '@/components/CollectionGallery.vue'
 
 const route = useRoute()
 const isLoading = ref(false)
 const isLoadingMore = ref(false)
 const collection = ref(null)
+const category = ref(null)
 const categoryId = computed(() => String(route.params.categoryId || ''))
 const collectionId = computed(() => String(route.params.collectionId || ''))
 
@@ -31,6 +31,33 @@ const visibleCount = ref(10)
 const displayedPhotos = computed(() => photos.value.slice(0, visibleCount.value))
 const hasMorePhotos = computed(() => visibleCount.value < photos.value.length)
 
+const heroImage = computed(() => {
+  if (collection.value?.image) return collection.value.image
+  if (photos.value[0]?.url) return photos.value[0].url
+  return ''
+})
+
+const worksDescription = computed(() => {
+  const categoryDescription = String(category.value?.description || '').trim()
+  if (categoryDescription) return categoryDescription
+
+  const location = String(collection.value?.location || '').trim()
+  if (location) return location
+
+  return 'Підбірка робіт з цієї колекції — живі моменти, емоції та атмосфера зйомки.'
+})
+
+const siblingCollections = computed(() => {
+  if (!category.value?.collections) return []
+
+  return Object.entries(category.value.collections)
+    .filter(([, value]) => !!value)
+    .map(([id, value]) => ({
+      collectionId: id,
+      name: value.name || id
+    }))
+})
+
 const loadMorePhotos = async () => {
   if (isLoadingMore.value || !hasMorePhotos.value) return
   isLoadingMore.value = true
@@ -42,10 +69,17 @@ const loadMorePhotos = async () => {
 const load = async () => {
   if (!categoryId.value || !collectionId.value) {
     collection.value = null
+    category.value = null
     return
   }
+
   isLoading.value = true
-  collection.value = await getCollection(categoryId.value, collectionId.value)
+  const [collectionData, categoryData] = await Promise.all([
+    getCollection(categoryId.value, collectionId.value),
+    getCategory(categoryId.value)
+  ])
+  collection.value = collectionData
+  category.value = categoryData
   isLoading.value = false
 }
 
@@ -58,134 +92,70 @@ watch([categoryId, collectionId], load)
 </script>
 
 <template>
-  <section>
-    <div class="collection-nav-buttons">
-      <RouterLink
-        :to="{ name: 'CategoryCollections', params: { categoryId } }"
-        class="back-link"
-      >
-        ← Go back to collections
-      </RouterLink>
-    </div>
-
+  <div class="collection-page">
     <template v-if="isLoading">
-      <p>Loading...</p>
+      <p class="collection-loading">Loading...</p>
     </template>
 
     <template v-else-if="collection">
-      <CollectionHeader :collection="collection" />
-      <CollectionGallery
-        :photos="displayedPhotos"
-        :fallback-image="collection.image"
-        :name="collection.name"
-        :total-photos="photos.length"
-        :photo-offset="0"
-        @load-more="loadMorePhotos"
-      />
-
-      <div class="collection-controls">
-        <button
-          v-if="hasMorePhotos"
-          class="load-more-btn"
-          @click="loadMorePhotos"
-          :disabled="isLoadingMore"
+      <section class="collection-hero">
+        <div
+          class="collection-hero__media"
+          :style="heroImage ? { backgroundImage: `url(${heroImage})` } : undefined"
         >
-          {{ isLoadingMore ? 'Loading...' : 'Завантажити ще 10 фото' }}
-        </button>
-      </div>
+          <div class="collection-hero__content">
+            <h1 class="collection-hero__title">{{ collection.name }}</h1>
+            <p v-if="collection.location" class="collection-hero__subtitle">
+              {{ collection.location }}
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <div class="collection-meta">
-        <p>Показано {{ displayedPhotos.length }} з {{ photos.length }} фото</p>
-      </div>
+      <section class="collection-works">
+        <div class="collection-works__header">
+          <RouterLink
+            :to="{ name: 'CategoryCollections', params: { categoryId } }"
+            class="collection-back"
+          >
+            ← Go back to collections
+          </RouterLink>
+
+          <div class="collection-works__intro">
+            <h2 class="collection-works__title">{{ collection.name }}</h2>
+            <p v-if="collection.location" class="collection-works__location">
+              {{ collection.location }}
+            </p>
+          </div>
+        </div>
+
+        <CollectionGallery
+          :photos="displayedPhotos"
+          :fallback-image="collection.image"
+          :name="collection.name"
+          :total-photos="photos.length"
+          :photo-offset="0"
+          @load-more="loadMorePhotos"
+        />
+
+        <div v-if="hasMorePhotos" class="collection-controls">
+          <button
+            class="collection-load-more"
+            @click="loadMorePhotos"
+            :disabled="isLoadingMore"
+          >
+            {{ isLoadingMore ? 'Loading...' : 'Завантажити ще' }}
+          </button>
+        </div>
+
+        <p class="collection-meta">
+          Показано {{ displayedPhotos.length }} з {{ photos.length }} фото
+        </p>
+      </section>
     </template>
 
     <template v-else>
-      <p>Collection not found.</p>
+      <p class="collection-empty">Collection not found.</p>
     </template>
-  </section>
+  </div>
 </template>
-
-<style scoped>
-.collection-nav-buttons {
-  display: flex;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
-
-.back-link--secondary {
-  opacity: 0.75;
-}
-</style>
-
-<style scoped>
-.collection-controls {
-  display: flex;
-  justify-content: center;
-  margin: 32px 0 18px;
-}
-
-.load-more-btn,
-.page-arrow,
-.pagination button {
-  border: 1px solid #111;
-  background: transparent;
-  color: #111;
-  width: 52px;
-  height: 52px;
-  margin: 0 6px;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.load-more-btn {
-  min-width: auto;
-  width: auto;
-  height: auto;
-  padding: 10px 18px;
-  border-radius: 0;
-  letter-spacing: 0.14em;
-}
-
-.load-more-btn:hover,
-.pagination button:hover:not(:disabled) {
-  background: #111;
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.pagination {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.pagination button.active {
-  background: #111;
-  color: #fff;
-}
-
-.page-arrow:disabled,
-.load-more-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.collection-meta {
-  text-align: center;
-  margin-top: 12px;
-  color: #333;
-  font-size: 14px;
-}
-</style>

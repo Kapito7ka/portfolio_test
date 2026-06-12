@@ -111,7 +111,7 @@ onUnmounted(() => {
 
 <template>
   <div class="collection-gallery">
-    <div v-if="photos.length" class="grid gallery-grid">
+    <div v-if="photos.length" class="gallery-grid">
       <button
         v-for="(p, idx) in photos"
         :key="p.fileName || p.url || idx"
@@ -124,7 +124,7 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <div v-else>
+    <div v-else class="collection-gallery__empty">
       <BaseImage v-if="fallbackImage" :src="fallbackImage" :alt="name" />
       <p v-else>Фото ще не додані.</p>
     </div>
@@ -173,144 +173,3 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.collection-gallery {
-  margin-top: 20px;
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(220px, auto);
-  grid-auto-flow: dense;
-  gap: 18px;
-}
-
-.gallery-thumb:nth-child(1),
-.gallery-thumb:nth-child(3) {
-  grid-row: span 2;
-}
-
-@media (max-width: 1024px) {
-  .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .gallery-thumb:nth-child(1),
-  .gallery-thumb:nth-child(3) {
-    grid-row: span 1;
-  }
-}
-
-@media (max-width: 640px) {
-  .gallery-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.gallery-thumb {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  display: block;
-}
-
-.gallery-thumb:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
-}
-
-.gallery-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.photo-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(10, 10, 10, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.photo-modal__content {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  max-height: 92vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.photo-modal__image {
-  width: 100%;
-  max-height: 92vh;
-  object-fit: contain;
-  border-radius: 18px;
-  box-shadow: 0 28px 100px rgba(0, 0, 0, 0.45);
-}
-
-.photo-modal__nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-}
-
-.photo-modal__nav--prev {
-  left: 16px;
-}
-
-.photo-modal__nav--next {
-  right: 16px;
-}
-
-.photo-modal__close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.photo-modal__meta {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 0.92rem;
-  letter-spacing: 0.06em;
-}
-</style>
-
