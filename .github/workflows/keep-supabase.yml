@@ -3,7 +3,6 @@ name: Keep Supabase Awake
 on:
   schedule:
     - cron: '0 */12 * * *'
-
   workflow_dispatch:
 
 jobs:
@@ -13,5 +12,14 @@ jobs:
     steps:
       - name: Ping Supabase
         run: |
-          curl "${{ secrets.SUPABASE_URL }}/rest/v1/" \
-          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/main_slides?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+
+          echo "HTTP Status: $STATUS"
+
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Supabase ping failed!"
+            exit 1
+          fi
