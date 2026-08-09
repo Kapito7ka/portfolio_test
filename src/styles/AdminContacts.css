@@ -1,47 +1,396 @@
 .admin-contacts {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 50px 24px;
-  box-sizing: border-box;
-  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  background: #ffffff;
-  color: #111;
+  max-width: 860px;
+  margin: 70px auto;
+  padding: 0 24px;
+  font-family: "Inter", sans-serif;
 }
+
+
+/* =========================
+   PAGE TITLE
+========================= */
 
 .admin-contacts h1 {
-  font-size: 22px;
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  margin: 0 0 50px;
+  color: #111;
+  text-align: center;
+}
+
+
+/* =========================
+   MAIN CARD
+========================= */
+
+.admin-contacts .block {
+  background: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 24px;
+  padding: 42px;
+
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+
+/* Заголовок всередині */
+
+.admin-contacts .block > h3 {
+  margin: 0 0 30px;
+
+  font-size: 20px;
   font-weight: 400;
-  letter-spacing: 1px;
-  margin-bottom: 40px;
+  letter-spacing: 0.5px;
+
   color: #111;
 }
 
-.block {
-  margin-bottom: 40px;
-  padding: 24px 22px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  background: #fff;
-  transition: all 0.2s ease;
+
+/* =========================
+   CONTACT LIST
+========================= */
+
+.admin-contacts ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.block:hover {
-  border-color: rgba(0, 0, 0, 0.15);
+
+/* Кожен контакт */
+
+.admin-contacts li {
+  display: flex;
+  align-items: center;
+
+  min-height: 72px;
+  padding: 14px 0;
+
+  border-bottom: 1px solid #eeeeee;
+
+  font-size: 15px;
+  color: #333;
 }
 
-.block h3 {
+
+/* Назва контакту
+   Наприклад: Телефон:
+*/
+
+.admin-contacts li strong {
+  flex-shrink: 0;
+
+  width: 150px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #111;
+}
+
+
+/* Значення контакту */
+
+.admin-contacts .contactValue {
+  flex: 1;
+  min-width: 0;
+
+  color: #333;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* Посилання */
+
+.admin-contacts a.contactValue {
+  color: #111;
+  text-decoration: none;
+
+  transition: opacity .2s ease;
+}
+
+.admin-contacts a.contactValue:hover {
+  opacity: 0.55;
+}
+
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.admin-contacts .contactActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-left: auto;
+  padding-left: 24px;
+
+  flex-shrink: 0;
+}
+
+
+/* Обидві кнопки */
+
+.admin-contacts .contactActions button {
+  min-width: 110px;
+
+  padding: 11px 18px;
+
+  border-radius: 12px;
+
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 
-  color: #555;
-  margin-bottom: 18px;
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    opacity .2s ease,
+    background .2s ease;
 }
-.block > * {
+
+
+/* Редагувати */
+
+.admin-contacts .contactActions button:first-child {
+  border: 1px solid #111;
+
+  background: #111;
+  color: #fff;
+}
+
+.admin-contacts .contactActions button:first-child:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+
+/* Видалити */
+
+.admin-contacts .contactActions button:last-child {
+  border: 1px solid #e53935;
+
+  background: #fff;
+  color: #e53935;
+}
+
+.admin-contacts .contactActions button:last-child:hover {
+  background: #fff5f5;
+  transform: translateY(-1px);
+}
+
+
+/* =========================
+   EDIT INPUT
+========================= */
+
+.admin-contacts .contactInput {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 13px 16px;
+
+  border: 1px solid #e7e7e7;
+  border-radius: 14px;
+
+  background: #fcfcfc;
+
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #111;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color .25s ease,
+    background .25s ease,
+    box-shadow .25s ease;
+}
+
+.admin-contacts .contactInput:focus {
+  outline: none;
+
+  border-color: #111;
+  background: #fff;
+
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =========================
+   ADD CONTACT FORM
+========================= */
+
+.admin-contacts form {
+  margin-top: 36px !important;
+}
+
+
+/* Заголовок "Додати контакт" */
+
+.admin-contacts form h3 {
+  margin: 0 0 24px;
+
+  font-size: 20px;
+  font-weight: 400;
+
+  color: #111;
+}
+
+
+/* Поля */
+
+.admin-contacts form input {
+  display: block;
+
   width: 100%;
+  box-sizing: border-box;
+
+  min-height: 58px;
+
+  padding: 18px 20px;
+
+  border: 1px solid #e7e7e7;
+  border-radius: 16px;
+
+  background: #fcfcfc;
+
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  color: #111;
+
+  transition:
+    border-color .25s ease,
+    background .25s ease,
+    box-shadow .25s ease;
 }
-body {
-  background: #f6f6f7;
+
+
+/* Друге поле */
+
+.admin-contacts form input + input {
+  margin-top: 12px;
+}
+
+
+/* Focus */
+
+.admin-contacts form input:focus {
+  outline: none;
+
+  border-color: #111;
+  background: #fff;
+
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+
+/* Placeholder */
+
+.admin-contacts form input::placeholder {
+  color: #999;
+}
+
+
+/* =========================
+   SAVE BUTTON
+========================= */
+
+.admin-contacts form > button {
+  margin-top: 18px;
+
+  border: none;
+
+  background: #111;
+  color: #fff;
+
+  padding: 14px 28px;
+
+  border-radius: 14px;
+
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform .2s ease,
+    opacity .2s ease;
+}
+
+.admin-contacts form > button:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.admin-contacts .contactError {
+  margin-top: 14px;
+
+  font-size: 13px;
+  color: #e53935;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .admin-contacts {
+    margin: 40px auto;
+    padding: 0 16px;
+  }
+
+  .admin-contacts h1 {
+    font-size: 28px;
+    letter-spacing: 4px;
+    margin-bottom: 35px;
+  }
+
+  .admin-contacts .block {
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .admin-contacts li {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .admin-contacts li strong {
+    width: 120px;
+  }
+
+  .admin-contacts .contactValue {
+    flex: 1;
+  }
+
+  .admin-contacts .contactActions {
+    width: 100%;
+    padding-left: 0;
+    margin-top: 8px;
+  }
+
+  .admin-contacts .contactActions button {
+    flex: 1;
+  }
 }
