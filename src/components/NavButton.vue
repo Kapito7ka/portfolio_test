@@ -21,7 +21,7 @@ export default {
     variant: {
       type: String,
       default: 'default',
-      validator: (value) => ['default', 'delete', 'edit', 'add'].includes(value)
+      validator: (value) => ['default', 'delete', 'edit', 'add', 'outline'].includes(value)
     },
     isActive: {
       type: Boolean,
@@ -46,9 +46,9 @@ export default {
 
 <style scoped>
 .nav-button {
-  padding: 8px 16px;
+  padding: 10px 26px;
   border: none;
-  border-radius: 4px;
+  border-radius: 14px;
   font-weight: 500;
   cursor: pointer;
   font-size: 14px;
@@ -57,42 +57,62 @@ export default {
 
 /* Default variant */
 .nav-button.default {
-  background-color: #f3f3f3;
-  color: #333;
+  background-color: #111;
+  color: #fff;
+  border: 1px solid #111;
 }
 
 .nav-button.default:hover:not(:disabled) {
-  background-color: #e0e0e0;
+  background-color: #000;
+  color: #fff;
 }
 
 /* Delete variant */
 .nav-button.delete {
-  background-color: #b42318;
-  color: #fff;
+  background-color: #fff;
+  color: #e53935;
+  border: 2px solid #e53935;
 }
 
 .nav-button.delete:hover:not(:disabled) {
-  background-color: #8b1a13;
+  background-color: #e53935;
+  color: #fff;
 }
 
 /* Edit variant */
 .nav-button.edit {
-  background-color: #ff9800;
+  background-color: #111;
   color: #fff;
+  border: 1px solid #111;
 }
 
 .nav-button.edit:hover:not(:disabled) {
-  background-color: #e68900;
+  background-color: #000;
+  border-color: #000;
+}
+
+/* Outline black variant for add-photo / cover actions */
+.nav-button.outline {
+  background-color: transparent;
+  color: #111;
+  border: 1px solid #111;
+}
+
+.nav-button.outline:hover:not(:disabled) {
+  background-color: #111;
+  color: #fff;
 }
 
 /* Add variant */
 .nav-button.add {
-  background-color: #42b883;
+  background-color: #2d8a45;
   color: #fff;
+  border: 1px solid #2d8a45;
 }
 
 .nav-button.add:hover:not(:disabled) {
-  background-color: #359670;
+  background-color: #236f35;
+  border-color: #236f35;
 }
 
 /* Active state */

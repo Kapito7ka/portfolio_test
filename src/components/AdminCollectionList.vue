@@ -32,13 +32,13 @@
           />
           <NavButton
             label="додати фото"
-            variant="add"
+            variant="outline"
             :disabled="isSaving || uploadingCollectionId === collection.id"
             @click.stop="$emit('addPhotos', collection.id)"
           />
           <NavButton
             label="обл. колекції"
-            variant="edit"
+            variant="outline"
             :disabled="isSaving || uploadingCollectionId === collection.id"
             @click.stop="$emit('setCollectionCover', collection.id)"
           />

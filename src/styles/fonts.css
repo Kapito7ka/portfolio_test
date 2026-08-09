@@ -1,0 +1,27 @@
+/* LTC Bodoni 175 — покладіть файли шрифту в public/fonts/ */
+@font-face {
+  font-family: 'LTC Bodoni 175';
+  src: url('/fonts/LTCBodoni175-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LTC Bodoni 175';
+  src: url('/fonts/LTCBodoni175-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --font-display: 'LTC Bodoni 175', 'Bodoni Moda', 'Didot', 'Bodoni 72', serif;
+  --font-nav: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  --color-heading: rgb(26, 26, 26);
+  --color-back: rgb(102, 102, 102);
+  --color-slider-text: rgb(255, 255, 255);
+  --portfolio-gutter: 80px;
+  --portfolio-gap: 24px;
+  --portfolio-section-gap: 56px;
+}

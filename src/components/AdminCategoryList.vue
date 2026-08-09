@@ -12,18 +12,18 @@
         :class="{ selected: selectedCategoryId === cat.id }"
         @click="$emit('select', cat.id)"
       >
-        <div class="collection-thumb">
-          <img v-if="cat.image" :src="cat.image" :alt="cat.name || cat.id" />
-          <div v-else class="collection-thumb-placeholder" />
-        </div>
         <div class="collection-info">
           <p class="collection-name">{{ cat.name || cat.id }}</p>
           <p class="collection-location" v-if="cat.description">{{ cat.description }}</p>
         </div>
+        <div class="collection-thumb">
+          <img v-if="cat.image" :src="cat.image" :alt="cat.name || cat.id" />
+          <div v-else class="collection-thumb-placeholder" />
+        </div>
         <div class="collection-actions">
           <NavButton
             label="обкладинка"
-            variant="edit"
+            variant="outline"
             :disabled="isSaving || uploadingCategoryId === cat.id"
             @click.stop="$emit('setCover', cat.id)"
           />

@@ -1,11 +1,12 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import '@/styles/AdminPortfolio.css'
 import NavButton from '@/components/NavButton.vue'
 import BaseImage from '@/components/BaseImage.vue'
 import AdminCategoryList from '@/components/AdminCategoryList.vue'
 import AdminCollectionList from '@/components/AdminCollectionList.vue'
 import slugify from 'slug'
-import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto, uploadInstagramSpotlightPhoto } from '@/supabase'
+import { uploadPhoto, uploadCategoryCover, uploadCollectionCover, deletePhoto } from '@/supabase'
 import { logout } from '@/supabase'
 import { useRouter } from 'vue-router'
 import BaseButton from '@/components/BaseButton.vue'
@@ -18,9 +19,7 @@ import {
   setCollectionPhotos,
   createCategory,
   deleteCategory,
-  deleteCollection,
-  getInstagramSpotlights,
-  saveInstagramSpotlights
+  deleteCollection
 } from '@/services/portfolioService'
 import { usePagination } from '@/composables/usePagination'
 
@@ -52,103 +51,6 @@ const newCollectionId = ref('')
 const newCategoryName = ref('')
 const newCategoryId = ref('')
 const newCategoryDescription = ref('')
-
-const emptyInstagramSlot = () => ({ imageUrl: '', postUrl: '', fileName: '' })
-const instagramSlots = ref([
-  emptyInstagramSlot(),
-  emptyInstagramSlot(),
-  emptyInstagramSlot()
-])
-
-const hydrateInstagramSlots = async () => {
-  const items = await getInstagramSpotlights()
-  for (let i = 0; i < 3; i++) {
-    const it = items[i]
-    instagramSlots.value[i] = it
-      ? {
-          imageUrl: String(it.imageUrl || '').trim(),
-          postUrl: String(it.postUrl || '').trim(),
-          fileName: String(it.fileName || '').trim()
-        }
-      : emptyInstagramSlot()
-  }
-}
-
-const handleInstagramSpotlightUpload = async (event, index) => {
-  const file = event.target.files?.[0]
-  event.target.value = ''
-  if (!file || index < 0 || index > 2) return
-
-  errorText.value = ''
-  successText.value = ''
-  isSaving.value = true
-  try {
-    const oldFileName = instagramSlots.value[index]?.fileName || ''
-    const result = await uploadInstagramSpotlightPhoto(file)
-    if (!result?.publicUrl) {
-      throw new Error('Не вдалося завантажити фото')
-    }
-    if (oldFileName && oldFileName !== result.fileName) {
-      try {
-        await deletePhoto(oldFileName)
-      } catch (err) {
-        console.warn('Не вдалося видалити попереднє фото Instagram:', err)
-      }
-    }
-    instagramSlots.value[index] = {
-      ...instagramSlots.value[index],
-      imageUrl: result.publicUrl,
-      fileName: result.fileName || ''
-    }
-    const ok = await saveInstagramSpotlights(instagramSlots.value.map((s) => ({ ...s })))
-    if (!ok) throw new Error('Не вдалося зберегти дані Instagram')
-    successText.value = 'Фото для Instagram оновлено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка завантаження'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const clearInstagramSlot = async (index) => {
-  if (index < 0 || index > 2) return
-  errorText.value = ''
-  successText.value = ''
-  isSaving.value = true
-  try {
-    const fn = instagramSlots.value[index]?.fileName
-    if (fn) {
-      try {
-        await deletePhoto(fn)
-      } catch (err) {
-        console.warn('Видалення файлу Instagram:', err)
-      }
-    }
-    instagramSlots.value[index] = emptyInstagramSlot()
-    const ok = await saveInstagramSpotlights(instagramSlots.value.map((s) => ({ ...s })))
-    if (!ok) throw new Error('Не вдалося зберегти')
-    successText.value = 'Слот Instagram очищено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка'
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const saveInstagramSlotsForm = async () => {
-  errorText.value = ''
-  successText.value = ''
-  isSaving.value = true
-  try {
-    const ok = await saveInstagramSpotlights(instagramSlots.value.map((s) => ({ ...s })))
-    if (!ok) throw new Error('Не вдалося зберегти блок Instagram')
-    successText.value = 'Посилання Instagram збережено.'
-  } catch (e) {
-    errorText.value = e?.message || 'Помилка збереження'
-  } finally {
-    isSaving.value = false
-  }
-}
 
 const generateSlug = (text) => {
   const value = typeof text === 'string' ? text.trim() : ''
@@ -187,6 +89,16 @@ const collectionOptions = computed(() => {
     .sort((a, b) => a.name.localeCompare(b.name, 'uk'))
 })
 
+const visibleCategories = computed(() => {
+  if (!selectedCategoryId.value) return categories.value
+  return categories.value.filter((cat) => cat.id === selectedCategoryId.value)
+})
+
+const visibleCollections = computed(() => {
+  if (!selectedCollectionId.value) return collectionOptions.value
+  return collectionOptions.value.filter((collection) => collection.id === selectedCollectionId.value)
+})
+
 const normalizedPhotos = computed(() => {
   const raw = selectedCollection.value?.photos
   if (!Array.isArray(raw)) return []
@@ -222,7 +134,6 @@ const load = async () => {
   errorText.value = ''
   isLoading.value = true
   categories.value = await getCategories()
-  await hydrateInstagramSlots()
   if (!selectedCategoryId.value && categories.value.length) {
     selectedCategoryId.value = categories.value[0].id
   }
@@ -245,6 +156,12 @@ watch([selectedCategoryId, selectedCollectionId], async () => {
 })
 
 watch(selectedCategoryId, () => {
+  if (!selectedCategoryId.value) {
+    selectedCollectionId.value = ''
+    selectedCollection.value = null
+    return
+  }
+
   const first = collectionOptions.value[0]?.id || ''
   selectedCollectionId.value = first
 })
@@ -263,6 +180,17 @@ const selectCollection = (collectionId) => {
   if (!collectionId) return
   selectedCollectionId.value = collectionId
   loadSelectedCollection()
+}
+
+const returnToAllCategories = () => {
+  selectedCategoryId.value = ''
+  selectedCollectionId.value = ''
+  selectedCollection.value = null
+}
+
+const returnToAllCollections = () => {
+  selectedCollectionId.value = ''
+  selectedCollection.value = null
 }
 
 const deleteCategoryHandler = async (catId) => {
@@ -548,7 +476,6 @@ const setCover = async (photo) => {
       photo.url
     )
 
-    // оновлюємо локально
     selectedCollection.value = {
       ...(selectedCollection.value || {}),
       image: photo.url
@@ -654,59 +581,18 @@ const createCategoryHandler = async () => {
         </div>
       </div>
 
-      <div class="block instagram-spotlights-admin">
-        <h2>Instagram під категоріями (3 фото)</h2>
-        <p class="instagram-spotlights-hint">
-          Превʼю та посилання на пост (reel / фото). На головній показуються плитки лише з заповненим посиланням.
-        </p>
-        <div class="instagram-spotlights-grid">
-          <div
-            v-for="(slot, idx) in instagramSlots"
-            :key="idx"
-            class="instagram-spotlight-card"
-          >
-            <p class="instagram-spotlight-num">Фото {{ idx + 1 }}</p>
-            <div v-if="slot.imageUrl" class="instagram-spotlight-preview">
-              <img :src="slot.imageUrl" alt="" />
-            </div>
-            <div v-else class="instagram-spotlight-preview instagram-spotlight-preview--empty">
-              Немає фото
-            </div>
-            <label class="instagram-file-label">
-              <input
-                type="file"
-                accept="image/*"
-                class="instagram-file-input"
-                :disabled="isSaving"
-                @change="handleInstagramSpotlightUpload($event, idx)"
-              />
-              Завантажити зображення
-            </label>
-            <input
-              v-model="slot.postUrl"
-              type="url"
-              class="instagram-post-url"
-              placeholder="https://www.instagram.com/p/… або reel"
-              :disabled="isSaving"
-            />
-            <button
-              type="button"
-              class="instagram-clear-btn"
-              :disabled="isSaving || (!slot.imageUrl && !slot.postUrl)"
-              @click="clearInstagramSlot(idx)"
-            >
-              Очистити слот
-            </button>
-          </div>
-        </div>
-        <NavButton label="Зберегти посилання" variant="add" :disabled="isSaving" @click="saveInstagramSlotsForm" />
-        <p class="instagram-spotlights-hint instagram-spotlights-hint--secondary">
-          Після збереження фото та посилання зʼявляться на головній під категоріями (онови сторінку сайту, якщо не бачиш змін).
-        </p>
+      <div v-if="selectedCategoryId || selectedCollectionId" class="admin-portfolio-toolbar admin-portfolio-toolbar--categories">
+        <NavButton
+          v-if="selectedCategoryId"
+          label="Повернутись до усіх категорій"
+          variant="outline"
+          :disabled="isSaving"
+          @click="returnToAllCategories"
+        />
       </div>
 
       <AdminCategoryList
-        :categories="categories"
+        :categories="visibleCategories"
         :selected-category-id="selectedCategoryId"
         :is-saving="isSaving"
         :uploading-category-id="uploadingCategoryId"
@@ -716,9 +602,21 @@ const createCategoryHandler = async () => {
         @edit="onEditCategory"
       />
 
+      <div
+        v-if="selectedCategoryId && selectedCollectionId"
+        class="admin-portfolio-toolbar admin-portfolio-toolbar--collections"
+      >
+        <NavButton
+          label="Повернутись до усіх колекцій"
+          variant="outline"
+          :disabled="isSaving"
+          @click="returnToAllCollections"
+        />
+      </div>
+
       <AdminCollectionList
         v-if="selectedCategoryId"
-        :collections="collectionOptions"
+        :collections="visibleCollections"
         :selected-collection-id="selectedCollectionId"
         :is-saving="isSaving"
         :uploading-collection-id="uploadingCollectionId"
@@ -730,16 +628,6 @@ const createCategoryHandler = async () => {
         @set-collection-cover="setCollectionCover"
       />
       <p v-else class="admin-hint-muted">Оберіть категорію зі списку вище, щоб керувати колекціями.</p>
-
-      <div v-if="showNewCollectionForm && selectedCategoryId" class="block">
-        <h2>Створити нову колекцію</h2>
-        <div class="row">
-          <input v-model="newCollectionName" placeholder="Назва колекції" />
-          <input v-model="newCollectionLocation" placeholder="Локація" />
-          <input v-model="newCollectionId" placeholder="ID (slug)" />
-          <BaseButton label="Створити" :disabled="isSaving" @click="createCollection" />
-        </div>
-      </div>
 
       <input
         ref="categoryFileInput"
@@ -764,7 +652,6 @@ const createCategoryHandler = async () => {
         @change="handleUpload"
       >
 
-      <!-- Прогрес завантаження -->
       <div v-if="isSaving && uploadProgress > 0" class="progress-container">
         <div class="progress-bar">
           <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
@@ -775,152 +662,34 @@ const createCategoryHandler = async () => {
       <p v-if="errorText" class="error">{{ errorText }}</p>
       <p v-if="successText" class="success">{{ successText }}</p>
 
-        <div v-if="normalizedPhotos.length" class="grid">
-          <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
-            <BaseImage :src="p.url" :alt="selectedCollection.name" />
-            <div class="photoActions">
-              <button
-                v-if="!isCoverPhoto(p)"
-                type="button"
-                :disabled="isSaving"
-                @click="setCover(p)"
-              >
-                Зробити обкладинкою
-              </button>
-              <button type="button" :disabled="isSaving" @click="removePhoto(p)"> Видалити</button>
-            </div>
+      <div v-if="normalizedPhotos.length" class="grid">
+        <div v-for="p in normalizedPhotos" :key="p.fileName || p.url" class="photoCard">
+          <BaseImage :src="p.url" :alt="selectedCollection.name" />
+          <div class="photoActions">
+            <button
+              v-if="!isCoverPhoto(p)"
+              type="button"
+              :disabled="isSaving"
+              @click="setCover(p)"
+            >
+              Зробити обкладинкою
+            </button>
+            <button type="button" :disabled="isSaving" @click="removePhoto(p)">Видалити</button>
           </div>
         </div>
+      </div>
+      <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
 
-        <p v-else class="admin-portfolio-else">Фото ще не додані.</p>
-      </template>
-    </section>
+      <div v-if="showNewCollectionForm && selectedCategoryId" class="block current-upload-form">
+        <h2>Створити нову колекцію</h2>
+        <div class="row">
+          <input v-model="newCollectionName" placeholder="Назва колекції" />
+          <input v-model="newCollectionLocation" placeholder="Локація" />
+          <input v-model="newCollectionId" placeholder="ID (slug)" />
+          <BaseButton label="Створити" :disabled="isSaving" @click="createCollection" />
+        </div>
+      </div>
+
+    </template>
+  </section>
 </template>
-
-<style scoped>
-.instagram-spotlights-admin {
-  margin-bottom: 28px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.instagram-spotlights-hint {
-  margin: 0 0 16px;
-  font-size: 13px;
-  color: #666;
-  max-width: 720px;
-  line-height: 1.5;
-}
-
-.instagram-spotlights-hint--secondary {
-  margin-top: 12px;
-  margin-bottom: 0;
-  font-size: 12px;
-  color: #888;
-}
-
-.admin-hint-muted {
-  margin: 16px 0 24px;
-  font-size: 13px;
-  color: #888;
-}
-
-.admin-hidden-file {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.instagram-spotlights-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-@media (max-width: 900px) {
-  .instagram-spotlights-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.instagram-spotlight-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: #fafafa;
-}
-
-.instagram-spotlight-num {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-}
-
-.instagram-spotlight-preview {
-  aspect-ratio: 3 / 4;
-  max-height: 220px;
-  overflow: hidden;
-  background: #e8e8e8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.instagram-spotlight-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.instagram-spotlight-preview--empty {
-  font-size: 12px;
-  color: #999;
-}
-
-.instagram-file-label {
-  font-size: 12px;
-  cursor: pointer;
-  color: #2196f3;
-}
-
-.instagram-file-input {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-}
-
-.instagram-post-url {
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 13px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.instagram-clear-btn {
-  align-self: flex-start;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
-}
-
-.instagram-clear-btn:hover:not(:disabled) {
-  border-color: #ff6b6b;
-  color: #ff6b6b;
-}
-</style>

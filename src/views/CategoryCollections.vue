@@ -99,26 +99,50 @@ watch(categoryId, load)
   width: 100%;
   margin: 0;
   padding: 0;
+  background: #fff;
+}
+
+.category-collections-page .portfolio-hero {
+  background: #f8f8f8;
 }
 
 .category-content-block {
-  margin-bottom: 20px;
-  padding: 15px 80px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px var(--portfolio-gutter) 72px;
 }
 
 .back-link-wrap {
   text-align: left;
-  margin: 18px 0 8px;
+  margin: 0 0 16px;
 }
 
-.back-link {
-  color: #777;
-  text-decoration: none;
-  font-weight: 600;
+.category-content-block .category-title {
+  margin: 0 0 28px;
+  padding: 0;
+  text-align: center !important;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: 0.12em;
 }
 
-.category-title,
-h1.category-title {
-  color: #666 !important;
+.category-content-block .collection-card-wrapper {
+  gap: 34px;
+}
+
+@media (max-width: 768px) {
+  .category-content-block {
+    padding: 24px 24px 56px;
+  }
+
+  .category-content-block .category-title {
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .category-content-block {
+    padding: 20px 20px 48px;
+  }
 }
 </style>

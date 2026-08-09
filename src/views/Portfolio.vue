@@ -39,16 +39,6 @@ onMounted(async () => {
   }
 })
 
-const categoryRows = computed(() => {
-  const cats = categories.value
-  if (!cats.length) return []
-  const rows = []
-  for (let i = 0; i < cats.length; i += 3) {
-    rows.push(cats.slice(i, i + 3))
-  }
-  return rows
-})
-
 const showInstagramSpotlights = computed(() =>
   instagramSpotlights.value.some((s) => s.postUrl && String(s.postUrl).trim())
 )
@@ -70,30 +60,24 @@ function instagramPostHref(url) {
       Ми знімаємо важливі моменти вашого життя — щоб кожна фотографія залишалась живою історією.
     </p>
 
-    <div
-      v-for="(row, idx) in categoryRows"
-      :key="`cat-row-${idx}`"
-      class="category-rows full-bleed"
-    >
-      <div class="category-row">
-        <RouterLink
-          v-for="cat in row"
-          :key="cat.id"
-          :to="{ name: 'CategoryCollections', params: { categoryId: cat.id } }"
-          class="category-tile"
-        >
-          <div class="category-tile__media">
-            <img
-              v-if="cat.image"
-              :src="cat.image"
-              :alt="cat.name || cat.id"
-              class="category-tile__img"
-            />
-            <div v-else class="category-tile__placeholder" />
-          </div>
-          <span class="category-tile__title">{{ cat.name || cat.id }}</span>
-        </RouterLink>
-      </div>
+    <div v-if="categories.length" class="category-grid">
+      <RouterLink
+        v-for="cat in categories"
+        :key="cat.id"
+        :to="{ name: 'CategoryCollections', params: { categoryId: cat.id } }"
+        class="category-tile"
+      >
+        <div class="category-tile__media">
+          <img
+            v-if="cat.image"
+            :src="cat.image"
+            :alt="cat.name || cat.id"
+            class="category-tile__img"
+          />
+          <div v-else class="category-tile__placeholder" />
+        </div>
+        <span class="category-tile__title">{{ cat.name || cat.id }}</span>
+      </RouterLink>
     </div>
 
     <section v-if="showInstagramSpotlights" class="ig-spotlights-section">

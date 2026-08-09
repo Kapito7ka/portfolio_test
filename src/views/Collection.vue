@@ -112,14 +112,18 @@ watch([categoryId, collectionId], load)
         </div>
       </section>
 
-      <section class="collection-works">
+      <div class="collection-page__spacing-after-hero" />
+
+      <div class="collection-page__content-shell">
         <div class="collection-works__header">
-          <RouterLink
-            :to="{ name: 'CategoryCollections', params: { categoryId } }"
-            class="collection-back"
-          >
-            ← Go back to collections
-          </RouterLink>
+          <div class="collection-back-wrap">
+            <RouterLink
+              :to="{ name: 'CategoryCollections', params: { categoryId } }"
+              class="collection-back"
+            >
+              ← Go back to collections
+            </RouterLink>
+          </div>
 
           <div class="collection-works__intro">
             <h2 class="collection-works__title">{{ collection.name }}</h2>
@@ -129,29 +133,31 @@ watch([categoryId, collectionId], load)
           </div>
         </div>
 
-        <CollectionGallery
-          :photos="displayedPhotos"
-          :fallback-image="collection.image"
-          :name="collection.name"
-          :total-photos="photos.length"
-          :photo-offset="0"
-          @load-more="loadMorePhotos"
-        />
+        <section class="collection-works">
+          <CollectionGallery
+            :photos="displayedPhotos"
+            :fallback-image="collection.image"
+            :name="collection.name"
+            :total-photos="photos.length"
+            :photo-offset="0"
+            @load-more="loadMorePhotos"
+          />
 
-        <div v-if="hasMorePhotos" class="collection-controls">
-          <button
-            class="collection-load-more"
-            @click="loadMorePhotos"
-            :disabled="isLoadingMore"
-          >
-            {{ isLoadingMore ? 'Loading...' : 'Завантажити ще' }}
-          </button>
-        </div>
+          <div v-if="hasMorePhotos" class="collection-controls">
+            <button
+              class="collection-load-more"
+              @click="loadMorePhotos"
+              :disabled="isLoadingMore"
+            >
+              {{ isLoadingMore ? 'Loading...' : 'Завантажити ще' }}
+            </button>
+          </div>
 
-        <p class="collection-meta">
-          Показано {{ displayedPhotos.length }} з {{ photos.length }} фото
-        </p>
-      </section>
+          <p class="collection-meta">
+            Показано {{ displayedPhotos.length }} з {{ photos.length }} фото
+          </p>
+        </section>
+      </div>
     </template>
 
     <template v-else>

@@ -25,8 +25,11 @@ const props = defineProps({
           :style="{ backgroundImage: slide.image_url ? `url(${slide.image_url})` : undefined }"
         >
           <div class="hero-slide__inner">
-            <h2 v-if="slide.title" class="hero-slide__title">{{ slide.title }}</h2>
-            <p class="hero-slide__kicker">{{ kicker }}</p>
+            <template v-if="slide.title">
+              <h2 class="hero-slide__title">{{ slide.title }}</h2>
+              <p v-if="kicker" class="hero-slide__kicker">{{ kicker }}</p>
+            </template>
+            <h2 v-else class="hero-slide__title">{{ kicker }}</h2>
           </div>
         </div>
       </swiper-slide>

@@ -27,7 +27,6 @@ defineProps({
       </div>
       <h3 class="collection-card__title">{{ item.name }}</h3>
       <p v-if="item.location" class="collection-card__location">{{ item.location }}</p>
-      <span class="collection-card__arrow">→</span>
     </RouterLink>
   </div>
 </template>
